@@ -45,6 +45,6 @@ func (m *Manager) RequireAdmin() bool {
 }
 
 func (m *Manager) InstalledPkgs() []pkg.Packager {
-	// TODO: Made functional this
+	// TODO: Made functional this.
 	return nil
 }
