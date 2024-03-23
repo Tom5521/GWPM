@@ -9,11 +9,11 @@ type Package struct {
 	manager *Manager
 }
 
-func (p *Package) Install(pkgs ...pkg.Packager) error {
+func (p *Package) Install() error {
 	return nil
 }
 
-func (p *Package) Uninstall(pkgs ...pkg.Packager) error {
+func (p *Package) Uninstall() error {
 	return nil
 }
 

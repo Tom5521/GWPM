@@ -8,6 +8,7 @@ import (
 type Package struct {
 	name string
 
+	version string
 	manager *Manager
 }
 
@@ -24,8 +25,7 @@ func (p *Package) Uninstall() error {
 }
 
 func (p *Package) Version() string {
-	// TODO: Fix this.
-	return ""
+	return p.version
 }
 
 func (p *Package) Name() string {

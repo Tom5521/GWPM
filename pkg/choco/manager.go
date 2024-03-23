@@ -1,6 +1,8 @@
 package choco
 
 import (
+	"regexp"
+
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/term"
 )
@@ -52,6 +54,18 @@ func (m *Manager) RequireAdmin() bool {
 }
 
 func (m *Manager) InstalledPkgs() []pkg.Packager {
-	// TODO: Made functional this.
-	return nil
+	out, err := term.NewCommand("choco", "list").Output()
+	if err != nil {
+		return []pkg.Packager{}
+	}
+	regex := regexp.MustCompile(`([^\s]+)\s+([\d.]+)`)
+	matches := regex.FindAllStringSubmatch(out, -1)
+	var pkgs []pkg.Packager
+	for _, match := range matches {
+		pkgs = append(pkgs, &Package{
+			name:    match[1],
+			version: match[2],
+		})
+	}
+	return pkgs
 }
