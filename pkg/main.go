@@ -7,7 +7,6 @@ type Packager interface {
 	Name() string
 	Installed() bool
 
-	ExistsManager() bool
 	Manager() Managerer
 }
 

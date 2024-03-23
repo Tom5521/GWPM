@@ -2,6 +2,7 @@ package choco
 
 import (
 	"github.com/Tom5521/GWPM/pkg"
+	"github.com/Tom5521/GWPM/pkg/term"
 )
 
 type Manager struct {
@@ -9,28 +10,34 @@ type Manager struct {
 	exists       bool
 	requireAdmin bool
 	version      string
+
+	HideActions bool
 }
 
 func (m *Manager) Install(pkgs ...pkg.Packager) error {
+	var pkglist []string
 	for _, p := range pkgs {
-		err := p.Install()
-		if err != nil {
-			return err
-		}
+		pkglist = append(pkglist, p.Name())
 	}
-	return nil
+	cmd := term.NewCommand("choco", "uninstall")
+	cmd.Args = append(cmd.Args, pkglist...)
+	cmd.Hide = m.HideActions
+	return cmd.Run()
 }
+
 func (m *Manager) Uninstall(pkgs ...pkg.Packager) error {
+	var pkglist []string
 	for _, p := range pkgs {
-		err := p.Uninstall()
-		if err != nil {
-			return err
-		}
+		pkglist = append(pkglist, p.Name())
 	}
-	return nil
+	cmd := term.NewCommand("choco", "uninstall")
+	cmd.Args = append(cmd.Args, pkglist...)
+	cmd.Hide = m.HideActions
+	return cmd.Run()
 }
+
 func (m *Manager) Version() string {
-	return m.name
+	return m.version
 }
 func (m *Manager) Exists() bool {
 	return m.exists

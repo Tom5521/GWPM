@@ -25,10 +25,6 @@ func (p *Package) Name() string {
 	return p.name
 }
 
-func (p *Package) ExistsManager() bool {
-	return true
-}
-
 func (p *Package) Manager() pkg.Managerer {
 	return p.manager
 }

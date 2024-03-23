@@ -8,20 +8,18 @@ import (
 type Package struct {
 	name string
 
-	HideCmdOnAction bool
-
 	manager *Manager
 }
 
 func (p *Package) Install() error {
 	cmd := term.NewCommand("choco", "install", p.name)
-	cmd.Hide = p.HideCmdOnAction
+	cmd.Hide = p.manager.HideActions
 	return cmd.Run()
 }
 
 func (p *Package) Uninstall() error {
 	cmd := term.NewCommand("choco", "uninstall", p.name)
-	cmd.Hide = p.HideCmdOnAction
+	cmd.Hide = p.manager.HideActions
 	return cmd.Run()
 }
 
