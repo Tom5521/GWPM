@@ -26,7 +26,7 @@ func (p *Package) Uninstall() error {
 }
 
 func (p *Package) Version() string {
-	// TODO: Fix this
+	// TODO: Fix this.
 	return ""
 }
 
