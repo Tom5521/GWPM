@@ -21,7 +21,7 @@ func Connect() *Manager {
 			if err != nil {
 				return ""
 			}
-			return string(out)
+			return out
 		}(),
 	}
 }
