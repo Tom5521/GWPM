@@ -12,15 +12,14 @@ import (
 // TODO:Document this.
 type Manager struct {
 	name         string
-	exists       bool
+	isInstalled  bool
 	requireAdmin bool
 	version      string
 
 	HideActions bool
 }
 
-// TODO:Change to pkgs...pkg.Packager
-func (m *Manager) Install(pkgs ...string) error {
+func (m *Manager) InstallByName(pkgs ...string) error {
 	if m.requireAdmin && !perm.IsAdmin {
 		return pkg.ErrNotAdministrator
 	}
@@ -32,17 +31,15 @@ func (m *Manager) Install(pkgs ...string) error {
 	return cmd.Run()
 }
 
-// TODO:Change to pkgs...string and rename to InstallByName
-func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
+func (m *Manager) Install(pkgs ...pkg.Packager) error {
 	var packages []string
 	for _, p := range pkgs {
 		packages = append(packages, p.Name())
 	}
-	return m.Install(packages...)
+	return m.InstallByName(packages...)
 }
 
-// TODO:Change this to pkgs...pkg.Packager
-func (m *Manager) Uninstall(pkgs ...string) error {
+func (m *Manager) UninstallByName(pkgs ...string) error {
 	if m.requireAdmin && !perm.IsAdmin {
 		return pkg.ErrNotAdministrator
 	}
@@ -54,20 +51,19 @@ func (m *Manager) Uninstall(pkgs ...string) error {
 	return cmd.Run()
 }
 
-// TODO:Change this to pkgs...Strings and rename to UninstallByName
-func (m *Manager) UninstallPkgs(pkgs ...pkg.Packager) error {
+func (m *Manager) Uninstall(pkgs ...pkg.Packager) error {
 	var packages []string
 	for _, p := range pkgs {
 		packages = append(packages, p.Name())
 	}
-	return m.Uninstall(packages...)
+	return m.UninstallByName(packages...)
 }
 
 func (m *Manager) Version() string {
 	return m.version
 }
 func (m *Manager) Exists() bool {
-	return m.exists
+	return m.isInstalled
 }
 
 func (m *Manager) Name() string {
@@ -78,9 +74,9 @@ func (m *Manager) RequireAdmin() bool {
 	return m.requireAdmin
 }
 
-func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
+func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
-	if !m.exists {
+	if !m.isInstalled {
 		return pkgs, pkg.ErrManagerNotInstalled
 	}
 	out, err := term.NewCommand("choco", "list", "-r").Output()
@@ -104,32 +100,55 @@ func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 
 	return pkgs, nil
 }
+
 func (m *Manager) RepoPkgByName(name string) (pkg.Packager, error) {
-	// TODO: Complete this.
-	return nil, nil
+	var lpkg *Package
+	s, err := m.Search(name)
+	if err != nil {
+		return lpkg, err
+	}
+	if len(s) == 0 {
+		return lpkg, pkg.ErrPkgNotFound
+	}
+	lpkg, ok := s[0].(*Package)
+	if !ok {
+		return lpkg, pkg.ErrPkgNotFound
+	}
+	return lpkg, nil
 }
 
 func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
-	// TODO: Complete this.
-	return nil, nil
-}
+	var lpkg *Package
 
-func (m *Manager) IsInstalled(p pkg.Packager) bool {
-	ipkgs, err := m.InstalledPkgs()
-	if err != nil {
-		return false
+	if !m.IsInLocal(&Package{name: name}) {
+		return lpkg, pkg.ErrPkgNotExists
 	}
-	for _, pkg := range ipkgs {
-		if pkg.Name() == p.Name() {
-			return true
+
+	s, err := m.LocalPkgs()
+	if err != nil {
+		return lpkg, err
+	}
+
+	for _, p := range s {
+		if p.Name() == name {
+			var ok bool
+			lpkg, ok = p.(*Package)
+			if !ok {
+				return &Package{}, pkg.ErrPkgNotFound
+			}
 		}
 	}
-	return false
+
+	return lpkg, nil
+}
+
+func (m *Manager) IsInstalled() bool {
+	return m.isInstalled
 }
 
 func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
-	if !m.exists {
+	if !m.isInstalled {
 		return pkgs, pkg.ErrManagerNotInstalled
 	}
 	// strings.Split > regex
@@ -156,7 +175,6 @@ func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 	return pkgs, nil
 }
 
-// NOTE: There is definitely a better way to do this.
 func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
 	repoPkgs, err := m.Search(pkg.Name())
 	if err != nil {
@@ -170,14 +188,13 @@ func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
 	return false
 }
 
-// NOTE: There is definitely a better way to do this.
-func (m *Manager) IsInLocal(pkg pkg.Packager) bool {
-	localPkgs, err := m.Search(pkg.Name())
+func (m *Manager) IsInLocal(p pkg.Packager) bool {
+	ipkgs, err := m.LocalPkgs()
 	if err != nil {
 		return false
 	}
-	for _, p := range localPkgs {
-		if p.Name() == pkg.Name() {
+	for _, pkg := range ipkgs {
+		if pkg.Name() == p.Name() {
 			return true
 		}
 	}

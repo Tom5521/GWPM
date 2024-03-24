@@ -9,6 +9,7 @@ var (
 	ErrPkgNotExists        = errors.New("the package not exists")
 	ErrPkgNotInstalled     = errors.New("the package isn't installed")
 	ErrNotAdministrator    = errors.New("not running as adminstrator")
+	ErrPkgNotFound         = errors.New("package not found")
 )
 
 // TODO:Comment and document this.
@@ -26,18 +27,17 @@ type Packager interface {
 // TODO:Comment and document this.
 // TODO: Unbloat this...?
 type Managerer interface {
-	Exists() bool
 	Name() string
 	RequireAdmin() bool
-	Install(...string) error
-	InstallPkgs(...Packager) error
-	Uninstall(...string) error
-	UninstallPkgs(...Packager) error
+	InstallByName(...string) error
+	Install(...Packager) error
+	UninstallByName(...string) error
+	Uninstall(...Packager) error
 	Version() string
-	InstalledPkgs() ([]Packager, error)
+	LocalPkgs() ([]Packager, error)
 	RepoPkgByName(string) (Packager, error)
 	LocalPkgByName(string) (Packager, error)
-	IsInstalled(Packager) bool
+	IsInstalled() bool
 	Search(string) ([]Packager, error)
 	IsInRepo(Packager) bool
 	IsInLocal(Packager) bool

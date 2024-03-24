@@ -10,7 +10,7 @@ import (
 var m = choco.Connect()
 
 func TestInstalledPkgs(t *testing.T) {
-	pkgs, err := m.InstalledPkgs()
+	pkgs, err := m.LocalPkgs()
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()
@@ -22,7 +22,7 @@ func TestInstalledPkgs(t *testing.T) {
 }
 
 func TestInstallPkgs(t *testing.T) {
-	err := m.Install("gsudo")
+	err := m.InstallByName("gsudo")
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()
@@ -32,7 +32,7 @@ func TestInstallPkgs(t *testing.T) {
 }
 
 func TestUninstallPkgs(t *testing.T) {
-	err := m.Uninstall("gsudo")
+	err := m.UninstallByName("gsudo")
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

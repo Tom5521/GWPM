@@ -11,7 +11,7 @@ func Connect() *Manager {
 	return &Manager{
 		name:         "Choco",
 		requireAdmin: true,
-		exists: func() bool {
+		isInstalled: func() bool {
 			_, err := exec.LookPath("choco")
 			return err == nil
 		}(),
