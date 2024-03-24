@@ -10,6 +10,7 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
+// TODO: Finish this.
 type Manager struct {
 	name         string
 	exists       bool

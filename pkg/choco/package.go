@@ -5,6 +5,7 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
+// TODO:Document this.
 type Package struct {
 	name string
 

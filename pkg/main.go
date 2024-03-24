@@ -11,6 +11,7 @@ var (
 	ErrNotAdministrator    = errors.New("not running as adminstrator")
 )
 
+// TODO:Comment and document this.
 type Packager interface {
 	Install() error
 	Uninstall() error
@@ -22,6 +23,8 @@ type Packager interface {
 	Repo() bool
 }
 
+// TODO:Comment and document this.
+// TODO: Unbloat this...?
 type Managerer interface {
 	Exists() bool
 	Name() string

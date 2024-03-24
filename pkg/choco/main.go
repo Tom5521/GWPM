@@ -6,6 +6,7 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
+// NOTE:Choco is fucking slow.
 func Connect() *Manager {
 	return &Manager{
 		name:         "Choco",

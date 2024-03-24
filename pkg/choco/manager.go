@@ -9,6 +9,7 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
+// TODO:Document this.
 type Manager struct {
 	name         string
 	exists       bool
@@ -18,6 +19,7 @@ type Manager struct {
 	HideActions bool
 }
 
+// TODO:Change to pkgs...pkg.Packager
 func (m *Manager) Install(pkgs ...string) error {
 	if m.requireAdmin && !perm.IsAdmin {
 		return pkg.ErrNotAdministrator
@@ -30,6 +32,7 @@ func (m *Manager) Install(pkgs ...string) error {
 	return cmd.Run()
 }
 
+// TODO:Change to pkgs...string and rename to InstallByName
 func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
 	var packages []string
 	for _, p := range pkgs {
@@ -38,6 +41,7 @@ func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
 	return m.Install(packages...)
 }
 
+// TODO:Change this to pkgs...pkg.Packager
 func (m *Manager) Uninstall(pkgs ...string) error {
 	if m.requireAdmin && !perm.IsAdmin {
 		return pkg.ErrNotAdministrator
@@ -50,6 +54,7 @@ func (m *Manager) Uninstall(pkgs ...string) error {
 	return cmd.Run()
 }
 
+// TODO:Change this to pkgs...Strings and rename to UninstallByName
 func (m *Manager) UninstallPkgs(pkgs ...pkg.Packager) error {
 	var packages []string
 	for _, p := range pkgs {
@@ -82,7 +87,7 @@ func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	if err != nil {
 		return pkgs, err
 	}
-
+	// strings.Split > regex
 	lines := strings.Split(out, "\n")
 	for _, line := range lines {
 		p := strings.SplitN(line, "|", 2)
@@ -100,11 +105,12 @@ func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	return pkgs, nil
 }
 func (m *Manager) RepoPkgByName(name string) (pkg.Packager, error) {
-
+	// TODO: Complete this.
 	return nil, nil
 }
 
 func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
+	// TODO: Complete this.
 	return nil, nil
 }
 
@@ -126,6 +132,7 @@ func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 	if !m.exists {
 		return pkgs, pkg.ErrManagerNotInstalled
 	}
+	// strings.Split > regex
 	cmd := term.NewCommand("choco", "search", "-r", pkgName)
 	out, err := cmd.Output()
 	if err != nil {
@@ -149,6 +156,7 @@ func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 	return pkgs, nil
 }
 
+// NOTE: There is definitely a better way to do this.
 func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
 	repoPkgs, err := m.Search(pkg.Name())
 	if err != nil {
@@ -162,6 +170,7 @@ func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
 	return false
 }
 
+// NOTE: There is definitely a better way to do this.
 func (m *Manager) IsInLocal(pkg pkg.Packager) bool {
 	localPkgs, err := m.Search(pkg.Name())
 	if err != nil {

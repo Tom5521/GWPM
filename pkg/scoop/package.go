@@ -5,6 +5,7 @@ package scoop
 
 import "github.com/Tom5521/GWPM/pkg"
 
+// TODO:Finish this.
 type Package struct {
 	name    string
 	version string

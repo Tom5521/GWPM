@@ -11,6 +11,7 @@ import (
 
 func (c *Command) Make() *exec.Cmd {
 	cmd := exec.Command(c.Bin, c.Args...)
+	// TODO:Improve this....?
 	if c.Hide {
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	} else {

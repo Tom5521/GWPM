@@ -8,6 +8,7 @@ import (
 	"os/exec"
 )
 
+// TODO: Remove this to release... or not...
 func (c *Command) Make() *exec.Cmd {
 	cmd := exec.Command(c.Bin, c.Args...)
 	if !c.Hide {
