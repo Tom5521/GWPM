@@ -17,5 +17,5 @@ type Managerer interface {
 	Install(...Packager) error
 	Uninstall(...Packager) error
 	Version() string
-	InstalledPkgs() []Packager
+	InstalledPkgs() ([]Packager, error)
 }

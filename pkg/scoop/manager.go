@@ -35,10 +35,10 @@ func (m *Manager) RequireAdmin() bool {
 	return m.requireAdmin
 }
 
-func (m *Manager) InstalledPkgs() []pkg.Packager {
+func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	out, err := term.NewCommand("scoop", "list").Output()
 	if err != nil {
-		return []pkg.Packager{}
+		return []pkg.Packager{}, err
 	}
 	re := regexp.MustCompile(`([^\s]+)\s+([\d.]+)\s+[^\s]+\s+[\d-]+\s+[\d:]+`)
 	matches := re.FindAllStringSubmatch(out, -1)
@@ -49,5 +49,5 @@ func (m *Manager) InstalledPkgs() []pkg.Packager {
 			version: match[2],
 		})
 	}
-	return pkgs
+	return pkgs, nil
 }

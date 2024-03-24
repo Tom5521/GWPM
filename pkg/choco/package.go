@@ -41,7 +41,8 @@ func (p *Package) Manager() pkg.Managerer {
 }
 
 func (p *Package) Installed() bool {
-	for _, ip := range p.manager.InstalledPkgs() {
+	ipkgs, _ := p.manager.InstalledPkgs()
+	for _, ip := range ipkgs {
 		if p.Name() == ip.Name() {
 			return true
 		}
