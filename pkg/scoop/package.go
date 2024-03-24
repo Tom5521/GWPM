@@ -1,3 +1,6 @@
+//go:build ignore
+// +build ignore
+
 package scoop
 
 import "github.com/Tom5521/GWPM/pkg"

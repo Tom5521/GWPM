@@ -148,3 +148,29 @@ func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 
 	return pkgs, nil
 }
+
+func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
+	repoPkgs, err := m.Search(pkg.Name())
+	if err != nil {
+		return false
+	}
+	for _, p := range repoPkgs {
+		if p.Name() == pkg.Name() {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Manager) IsInLocal(pkg pkg.Packager) bool {
+	localPkgs, err := m.Search(pkg.Name())
+	if err != nil {
+		return false
+	}
+	for _, p := range localPkgs {
+		if p.Name() == pkg.Name() {
+			return true
+		}
+	}
+	return false
+}
