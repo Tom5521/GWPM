@@ -4,14 +4,25 @@
 package term
 
 import (
+	"os"
 	"os/exec"
 	"syscall"
 )
 
-func (c *Command) make() *exec.Cmd {
+func (c *Command) Make() *exec.Cmd {
 	cmd := exec.Command(c.Bin, c.Args...)
 	if c.Hide {
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	} else {
+		if c.Stdout {
+			cmd.Stdout = os.Stdout
+		}
+		if c.Stderr {
+			cmd.Stderr = os.Stderr
+		}
+		if c.Stdin {
+			cmd.Stdin = os.Stdin
+		}
 	}
 	return cmd
 }

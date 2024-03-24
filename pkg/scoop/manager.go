@@ -14,12 +14,20 @@ type Manager struct {
 	version      string
 }
 
-func (m *Manager) Install(pkgs ...pkg.Packager) error {
+func (m *Manager) Install(pkgs ...string) error {
 	return nil
 }
-func (m *Manager) Uninstall(pkgs ...pkg.Packager) error {
+func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
 	return nil
 }
+
+func (m *Manager) Uninstall(pkgs ...string) error {
+	return nil
+}
+func (m *Manager) UninstallPkgs(pkgs ...pkg.Packager) error {
+	return nil
+}
+
 func (m *Manager) Version() string {
 	return m.version
 }

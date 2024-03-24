@@ -1,9 +1,11 @@
 package choco
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/Tom5521/GWPM/pkg"
+	"github.com/Tom5521/GWPM/pkg/perm"
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
@@ -16,26 +18,44 @@ type Manager struct {
 	HideActions bool
 }
 
-func (m *Manager) Install(pkgs ...pkg.Packager) error {
-	var pkglist []string
-	for _, p := range pkgs {
-		pkglist = append(pkglist, p.Name())
+func (m *Manager) Install(pkgs ...string) error {
+	if m.requireAdmin && !perm.IsAdmin {
+		return pkg.ErrNotAdministrator
 	}
-	cmd := term.NewCommand("choco", "uninstall")
-	cmd.Args = append(cmd.Args, pkglist...)
+	cmd := term.NewCommand("choco", "install", "-y")
+	cmd.Args = append(cmd.Args, pkgs...)
 	cmd.Hide = m.HideActions
+	fmt.Println(cmd.Make())
+
 	return cmd.Run()
 }
 
-func (m *Manager) Uninstall(pkgs ...pkg.Packager) error {
-	var pkglist []string
+func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
+	var packages []string
 	for _, p := range pkgs {
-		pkglist = append(pkglist, p.Name())
+		packages = append(packages, p.Name())
 	}
-	cmd := term.NewCommand("choco", "uninstall")
-	cmd.Args = append(cmd.Args, pkglist...)
+	return m.Install(packages...)
+}
+
+func (m *Manager) Uninstall(pkgs ...string) error {
+	if m.requireAdmin && !perm.IsAdmin {
+		return pkg.ErrNotAdministrator
+	}
+	cmd := term.NewCommand("choco", "uninstall", "-y")
+	cmd.Args = append(cmd.Args, pkgs...)
 	cmd.Hide = m.HideActions
+	fmt.Println(cmd.Make())
+
 	return cmd.Run()
+}
+
+func (m *Manager) UninstallPkgs(pkgs ...pkg.Packager) error {
+	var packages []string
+	for _, p := range pkgs {
+		packages = append(packages, p.Name())
+	}
+	return m.Uninstall(packages...)
 }
 
 func (m *Manager) Version() string {
@@ -55,8 +75,8 @@ func (m *Manager) RequireAdmin() bool {
 
 func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
-	if m.exists {
-		return pkgs, pkg.ErrManagerNotExists
+	if !m.exists {
+		return pkgs, pkg.ErrManagerNotInstalled
 	}
 	out, err := term.NewCommand("choco", "list").Output()
 	if err != nil {
@@ -66,6 +86,9 @@ func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	matches := regex.FindAllStringSubmatch(out, -1)
 
 	for _, match := range matches {
+		if match[1] == "chocolatey" {
+			continue
+		}
 		pkgs = append(pkgs, &Package{
 			name:    match[1],
 			version: match[2],

@@ -13,13 +13,13 @@ type Package struct {
 }
 
 func (p *Package) Install() error {
-	cmd := term.NewCommand("choco", "install", p.name)
+	cmd := term.NewCommand("choco", "install", "-y", p.name)
 	cmd.Hide = p.manager.HideActions
 	return cmd.Run()
 }
 
 func (p *Package) Uninstall() error {
-	cmd := term.NewCommand("choco", "uninstall", p.name)
+	cmd := term.NewCommand("choco", "uninstall", "-y", p.name)
 	cmd.Hide = p.manager.HideActions
 	return cmd.Run()
 }

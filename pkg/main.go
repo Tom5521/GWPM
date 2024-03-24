@@ -3,7 +3,10 @@ package pkg
 import "errors"
 
 var (
-	ErrManagerNotExists = errors.New("the package manager isn't installed")
+	ErrManagerNotInstalled = errors.New("the package manager isn't installed")
+	ErrPkgNotExists        = errors.New("the package not exists")
+	ErrPkgNotInstalled     = errors.New("the package isn't installed")
+	ErrNotAdministrator    = errors.New("not running as adminstrator")
 )
 
 type Packager interface {
@@ -20,8 +23,10 @@ type Managerer interface {
 	Exists() bool
 	Name() string
 	RequireAdmin() bool
-	Install(...Packager) error
-	Uninstall(...Packager) error
+	Install(...string) error
+	InstallPkgs(...Packager) error
+	Uninstall(...string) error
+	UninstallPkgs(...Packager) error
 	Version() string
 	InstalledPkgs() ([]Packager, error)
 }

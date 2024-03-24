@@ -11,17 +11,19 @@ func NewCommand(bin string, args ...string) *Command {
 type Command struct {
 	Hide bool
 
+	Stdout, Stderr, Stdin bool
+
 	Bin  string
 	Args []string
 }
 
 func (c *Command) Run() error {
-	cmd := c.make()
+	cmd := c.Make()
 	return cmd.Run()
 }
 
 func (c *Command) Output() (string, error) {
-	cmd := c.make()
-	out, err := cmd.Output()
+	cmd := c.Make()
+	out, err := cmd.CombinedOutput()
 	return string(out), err
 }
