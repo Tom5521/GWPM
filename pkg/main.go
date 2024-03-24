@@ -1,5 +1,11 @@
 package pkg
 
+import "errors"
+
+var (
+	ErrManagerNotExists = errors.New("the package manager isn't installed")
+)
+
 type Packager interface {
 	Install() error
 	Uninstall() error

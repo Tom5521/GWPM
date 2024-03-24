@@ -54,13 +54,17 @@ func (m *Manager) RequireAdmin() bool {
 }
 
 func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
+	var pkgs []pkg.Packager
+	if m.exists {
+		return pkgs, pkg.ErrManagerNotExists
+	}
 	out, err := term.NewCommand("choco", "list").Output()
 	if err != nil {
-		return []pkg.Packager{}, err
+		return pkgs, err
 	}
 	regex := regexp.MustCompile(`([^\s]+)\s+([\d.]+)`)
 	matches := regex.FindAllStringSubmatch(out, -1)
-	var pkgs []pkg.Packager
+
 	for _, match := range matches {
 		pkgs = append(pkgs, &Package{
 			name:    match[1],
