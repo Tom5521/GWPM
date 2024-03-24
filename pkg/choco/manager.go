@@ -2,7 +2,7 @@ package choco
 
 import (
 	"fmt"
-	"regexp"
+	"strings"
 
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/perm"
@@ -78,21 +78,73 @@ func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
 	if !m.exists {
 		return pkgs, pkg.ErrManagerNotInstalled
 	}
-	out, err := term.NewCommand("choco", "list").Output()
+	out, err := term.NewCommand("choco", "list", "-r").Output()
 	if err != nil {
 		return pkgs, err
 	}
-	regex := regexp.MustCompile(`([^\s]+)\s+([\d.]+)`)
-	matches := regex.FindAllStringSubmatch(out, -1)
 
-	for _, match := range matches {
-		if match[1] == "chocolatey" {
+	lines := strings.Split(out, "\n")
+	for _, line := range lines {
+		p := strings.SplitN(line, "|", 2)
+		if len(p) < 2 {
 			continue
 		}
 		pkgs = append(pkgs, &Package{
-			name:    match[1],
-			version: match[2],
+			name:    p[0],
+			version: p[1],
+			manager: m,
+			local:   true,
 		})
 	}
+
+	return pkgs, nil
+}
+func (m *Manager) RepoPkgByName(name string) (pkg.Packager, error) {
+
+	return nil, nil
+}
+
+func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
+	return nil, nil
+}
+
+func (m *Manager) IsInstalled(p pkg.Packager) bool {
+	ipkgs, err := m.InstalledPkgs()
+	if err != nil {
+		return false
+	}
+	for _, pkg := range ipkgs {
+		if pkg.Name() == p.Name() {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
+	var pkgs []pkg.Packager
+	if !m.exists {
+		return pkgs, pkg.ErrManagerNotInstalled
+	}
+	cmd := term.NewCommand("choco", "search", "-r", pkgName)
+	out, err := cmd.Output()
+	if err != nil {
+		return pkgs, err
+	}
+
+	lines := strings.Split(out, "\n")
+	for _, line := range lines {
+		p := strings.SplitN(line, "|", 2)
+		if len(p) < 2 {
+			continue
+		}
+		pkgs = append(pkgs, &Package{
+			name:    p[0],
+			version: p[1],
+			manager: m,
+			repo:    true,
+		})
+	}
+
 	return pkgs, nil
 }

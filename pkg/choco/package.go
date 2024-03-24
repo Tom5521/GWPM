@@ -8,6 +8,8 @@ import (
 type Package struct {
 	name string
 
+	local, repo bool
+
 	version string
 	manager *Manager
 }
@@ -48,4 +50,11 @@ func (p *Package) Installed() bool {
 		}
 	}
 	return false
+}
+
+func (p *Package) Local() bool {
+	return p.local
+}
+func (p *Package) Repo() bool {
+	return p.repo
 }

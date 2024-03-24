@@ -1,6 +1,8 @@
 package pkg
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrManagerNotInstalled = errors.New("the package manager isn't installed")
@@ -15,8 +17,9 @@ type Packager interface {
 	Version() string
 	Name() string
 	Installed() bool
-
 	Manager() Managerer
+	Local() bool
+	Repo() bool
 }
 
 type Managerer interface {
@@ -29,4 +32,8 @@ type Managerer interface {
 	UninstallPkgs(...Packager) error
 	Version() string
 	InstalledPkgs() ([]Packager, error)
+	RepoPkgByName(string) (Packager, error)
+	LocalPkgByName(string) (Packager, error)
+	IsInstalled(Packager) bool
+	Search(string) ([]Packager, error)
 }

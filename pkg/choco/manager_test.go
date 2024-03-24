@@ -42,3 +42,19 @@ func TestUninstallPkgs(t *testing.T) {
 func TestFinalPkgs(t *testing.T) {
 	TestInstalledPkgs(t)
 }
+
+func TestSearch(t *testing.T) {
+	pkgs, err := m.Search("vscode")
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+	}
+	if len(pkgs) == 0 {
+		fmt.Println("pkg len is 0!")
+		t.Fail()
+	}
+	for _, p := range pkgs {
+		fmt.Printf("%s ", p.Name())
+	}
+	fmt.Println()
+}
