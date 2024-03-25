@@ -1,10 +1,10 @@
-//go:build ignore
-// +build ignore
-
 package scoop
 
 import (
-	"regexp"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/term"
@@ -13,53 +13,218 @@ import (
 // TODO: Finish this.
 type Manager struct {
 	name         string
-	exists       bool
+	isInstalled  bool
 	requireAdmin bool
 	version      string
-}
 
-func (m *Manager) Install(pkgs ...string) error {
-	return nil
-}
-func (m *Manager) InstallPkgs(pkgs ...pkg.Packager) error {
-	return nil
-}
-
-func (m *Manager) Uninstall(pkgs ...string) error {
-	return nil
-}
-func (m *Manager) UninstallPkgs(pkgs ...pkg.Packager) error {
-	return nil
-}
-
-func (m *Manager) Version() string {
-	return m.version
-}
-func (m *Manager) Exists() bool {
-	return m.exists
+	HideActions bool
 }
 
 func (m *Manager) Name() string {
 	return m.name
 }
-
 func (m *Manager) RequireAdmin() bool {
 	return m.requireAdmin
 }
+func (m *Manager) InstallByName(pkgs ...string) error {
+	cmd := term.NewCommand("scoop", "install")
+	cmd.Args = append(cmd.Args, pkgs...)
+	cmd.Hide = m.HideActions
+	return cmd.Run()
+}
 
-func (m *Manager) InstalledPkgs() ([]pkg.Packager, error) {
-	out, err := term.NewCommand("scoop", "list").Output()
-	if err != nil {
-		return []pkg.Packager{}, err
+func (m *Manager) Install(pkgs ...pkg.Packager) error {
+	var strPkgs []string
+	for _, p := range pkgs {
+		strPkgs = append(strPkgs, p.Name())
 	}
-	re := regexp.MustCompile(`([^\s]+)\s+([\d.]+)\s+[^\s]+\s+[\d-]+\s+[\d:]+`)
-	matches := re.FindAllStringSubmatch(out, -1)
+	return m.InstallByName(strPkgs...)
+}
+
+func (m *Manager) UninstallByName(pkgs ...string) error {
+	cmd := term.NewCommand("scoop", "uninstall")
+	cmd.Args = append(cmd.Args, pkgs...)
+	cmd.Hide = m.HideActions
+	return cmd.Run()
+}
+
+func (m *Manager) Uninstall(pkgs ...pkg.Packager) error {
+	var strPkgs []string
+	for _, p := range pkgs {
+		strPkgs = append(strPkgs, p.Name())
+	}
+	return m.UninstallByName(strPkgs...)
+}
+
+func (m *Manager) Version() string {
+	return m.version
+}
+
+/*
+Export JSON Template
+{
+    "buckets": [
+        {
+            "Name": "main",
+            "Source": "~\\scoop\\buckets\\main",
+            "Updated": "\/Date(1711372226285)\/",
+            "Manifests": 1310
+        }
+    ],
+    "apps": [
+        {
+            "Info": "",
+            "Source": "main",
+            "Name": "psutils",
+            "Version": "0.2023.06.28",
+            "Updated": "\/Date(1711372676457)\/"
+        }
+    ]
+}
+*/
+
+func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
-	for _, match := range matches {
+
+	var Packages struct {
+		Buckets []struct {
+			Name      string `json:"Name"`
+			Source    string `json:"Source"`
+			Updated   string `json:"Updated"`
+			Manifests int    `json:"Manifests"`
+		} `json:"buckets"`
+		Apps []struct {
+			Info    string `json:"Info"`
+			Source  string `json:"Source"`
+			Name    string `json:"Name"`
+			Version string `json:"Version"`
+			Updated string `json:"Updated"`
+		} `json:"apps"`
+	}
+
+	cmd := term.NewCommand("scoop", "export")
+	cmd.Hide = true
+	out, err := cmd.Output()
+	if err != nil {
+		return pkgs, err
+	}
+	err = json.Unmarshal([]byte(out), &Packages)
+	if err != nil {
+		return pkgs, err
+	}
+
+	for _, p := range Packages.Apps {
 		pkgs = append(pkgs, &Package{
-			name:    match[1],
-			version: match[2],
+			name:    p.Name,
+			version: p.Version,
+			bucket:  p.Source,
+			manager: m,
+			local:   true,
 		})
 	}
+
 	return pkgs, nil
+}
+
+func (m *Manager) RepoPkgByName(p string) (pkg.Packager, error) {
+	var rpkg *Package
+
+	rpkgs, err := m.Search(p)
+	if err != nil {
+		return rpkg, err
+	}
+
+	if len(rpkgs) == 0 {
+		return rpkg, pkg.ErrPkgNotFound
+	}
+
+	rpkg = &Package{
+		name:    rpkgs[0].(*Package).name,
+		version: rpkgs[0].(*Package).version,
+		manager: m,
+		repo:    true,
+	}
+
+	return rpkg, nil
+}
+
+func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
+	var lpkg *Package
+
+	lpkgs, err := m.LocalPkgs()
+	if err != nil {
+		return lpkg, err
+	}
+
+	for _, p := range lpkgs {
+		if p.Name() == name {
+			var ok bool
+			lpkg, ok = p.(*Package)
+			if !ok {
+				return &Package{}, pkg.ErrPkgNotFound
+			}
+		}
+	}
+
+	return lpkg, nil
+}
+
+func (m *Manager) IsInstalled() bool {
+	return m.isInstalled
+}
+
+func (m *Manager) Search(p string) ([]pkg.Packager, error) {
+	var pkgs []pkg.Packager
+	out, err := term.NewCommand("scoop", "search", p).Output()
+	if err != nil {
+		return pkgs, err
+	}
+
+	if strings.Contains(out, "GitHub API rate limit reached.") {
+		fmt.Println("Please try again later or configure your API token using 'scoop config gh_token <your token>'.")
+		return pkgs, errors.New("github API rate limit reached")
+	}
+
+	lines := strings.Split(out, "\n")[4:] // [4:] to skip header
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) < 2 {
+			continue
+		}
+		pkgs = append(pkgs, &Package{
+			name:    parts[0],
+			bucket:  parts[1],
+			version: "unknown",
+			repo:    true,
+			manager: m,
+		})
+	}
+
+	return pkgs, nil
+}
+
+func (m *Manager) IsInRepo(p pkg.Packager) bool {
+	rpkgs, err := m.Search(p.Name())
+	if err != nil {
+		return false
+	}
+	for _, rpkg := range rpkgs {
+		if rpkg.Name() == p.Name() {
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Manager) IsInLocal(p pkg.Packager) bool {
+	lpkgs, err := m.LocalPkgs()
+	if err != nil {
+		return false
+	}
+	for _, lpkg := range lpkgs {
+		if lpkg.Name() == p.Name() {
+			return true
+		}
+	}
+	return false
 }

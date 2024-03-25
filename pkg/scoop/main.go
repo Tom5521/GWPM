@@ -1,6 +1,3 @@
-//go:build ignore
-// +build ignore
-
 package scoop
 
 import (
@@ -13,7 +10,7 @@ func Connect() *Manager {
 	return &Manager{
 		name:         "Scoop",
 		requireAdmin: false,
-		exists: func() bool {
+		isInstalled: func() bool {
 			_, err := exec.LookPath("scoop")
 			return err == nil
 		}(),

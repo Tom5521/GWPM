@@ -3,11 +3,18 @@ package choco_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/Tom5521/GWPM/pkg/choco"
 )
 
 var m = choco.Connect()
+
+func TestConnectSpeed(t *testing.T) {
+	now := time.Now()
+	choco.Connect()
+	fmt.Println(time.Since(now))
+}
 
 func TestInstalledPkgs(t *testing.T) {
 	pkgs, err := m.LocalPkgs()
