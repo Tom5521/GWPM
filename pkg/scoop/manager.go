@@ -10,7 +10,6 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
-// TODO: Finish this.
 type Manager struct {
 	name         string
 	isInstalled  bool
@@ -23,9 +22,11 @@ type Manager struct {
 func (m *Manager) Name() string {
 	return m.name
 }
+
 func (m *Manager) RequireAdmin() bool {
 	return m.requireAdmin
 }
+
 func (m *Manager) InstallByName(pkgs ...string) error {
 	cmd := term.NewCommand("scoop", "install")
 	cmd.Args = append(cmd.Args, pkgs...)
@@ -86,7 +87,7 @@ Export JSON Template
 func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
 
-	var Packages struct {
+	var packages struct {
 		Buckets []struct {
 			Name      string `json:"Name"`
 			Source    string `json:"Source"`
@@ -108,12 +109,12 @@ func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	if err != nil {
 		return pkgs, err
 	}
-	err = json.Unmarshal([]byte(out), &Packages)
+	err = json.Unmarshal([]byte(out), &packages)
 	if err != nil {
 		return pkgs, err
 	}
 
-	for _, p := range Packages.Apps {
+	for _, p := range packages.Apps {
 		pkgs = append(pkgs, &Package{
 			name:    p.Name,
 			version: p.Version,
@@ -138,14 +139,13 @@ func (m *Manager) RepoPkgByName(p string) (pkg.Packager, error) {
 		return rpkg, pkg.ErrPkgNotFound
 	}
 
-	rpkg = &Package{
-		name:    rpkgs[0].(*Package).name,
-		version: rpkgs[0].(*Package).version,
-		manager: m,
-		repo:    true,
+	for _, rp := range rpkgs {
+		if rpkg.Name() == rp.Name() {
+			return rp, nil
+		}
 	}
 
-	return rpkg, nil
+	return rpkg, pkg.ErrPkgNotFound
 }
 
 func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
@@ -158,15 +158,11 @@ func (m *Manager) LocalPkgByName(name string) (pkg.Packager, error) {
 
 	for _, p := range lpkgs {
 		if p.Name() == name {
-			var ok bool
-			lpkg, ok = p.(*Package)
-			if !ok {
-				return &Package{}, pkg.ErrPkgNotFound
-			}
+			return p, nil
 		}
 	}
 
-	return lpkg, nil
+	return lpkg, pkg.ErrPkgNotFound
 }
 
 func (m *Manager) IsInstalled() bool {
@@ -189,6 +185,9 @@ func (m *Manager) Search(p string) ([]pkg.Packager, error) {
 	for _, line := range lines {
 		parts := strings.Fields(line)
 		if len(parts) < 2 {
+			continue
+		}
+		if parts[0] == "----" {
 			continue
 		}
 		pkgs = append(pkgs, &Package{

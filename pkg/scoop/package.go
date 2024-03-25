@@ -17,11 +17,11 @@ type Package struct {
 }
 
 func (p *Package) Install() error {
-	return nil
+	return p.manager.Install(p)
 }
 
 func (p *Package) Uninstall() error {
-	return nil
+	return p.manager.Uninstall(p)
 }
 
 func (p *Package) Version() string {
@@ -37,7 +37,17 @@ func (p *Package) Manager() pkg.Managerer {
 }
 
 func (p *Package) Installed() bool {
-	return true
+	lpkgs, err := p.manager.LocalPkgs()
+	if err != nil {
+		return false
+	}
+	for _, lp := range lpkgs {
+		if lp.Name() == p.Name() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (p *Package) Local() bool {
@@ -51,19 +61,3 @@ func (p *Package) Repo() bool {
 func (p *Package) Bucket() string {
 	return p.bucket
 }
-
-/*
-Methods
-
-type Packager interface {
-	Install() error
-	Uninstall() error
-	Version() string
-	Name() string
-	Installed() bool
-	Manager() Managerer
-	Local() bool
-	Repo() bool
-}
-
-*/
