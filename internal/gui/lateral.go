@@ -9,7 +9,6 @@ import (
 
 type Lateral struct {
 	*widget.Form
-	pkg pkg.Packager
 
 	Name      *widget.FormItem
 	Version   *widget.FormItem
@@ -19,28 +18,17 @@ type Lateral struct {
 	Repo      *widget.FormItem
 }
 
-func (l *Lateral) Show() {
-	l.makeItems()
-	l.Form.Show()
+func (l *Lateral) makeForm(text string, content ...any) *widget.FormItem {
+	return widget.NewFormItem(text, widget.NewLabel(fmt.Sprint(content...)))
 }
 
-func (l *Lateral) makeItems() {
-	makeFormItem := func(text string, c ...any) *widget.FormItem {
-		return widget.NewFormItem(text, widget.NewLabel(fmt.Sprint(c...)))
-	}
-	l.Name = makeFormItem("Name", l.pkg.Name())
-	l.Version = makeFormItem("Name", l.pkg.Version())
-	l.Installed = makeFormItem("Installed", l.pkg.Installed())
-	l.Manager = makeFormItem("Manager", l.pkg.Manager().Name())
-	l.Local = makeFormItem("Local", l.pkg.Local())
-	l.Repo = makeFormItem("Repo", l.pkg.Repo())
-}
-
-func InitLateral(packager pkg.Packager) *Lateral {
-	l := &Lateral{
-		pkg: packager,
-	}
-	l.makeItems()
+func (l *Lateral) Init() {
+	l.Name = l.makeForm("Name:")
+	l.Version = l.makeForm("Version:")
+	l.Installed = l.makeForm("Is Installed:")
+	l.Manager = l.makeForm("Manager:")
+	l.Local = l.makeForm("In Local:")
+	l.Repo = l.makeForm("In Repo:")
 	l.Form = widget.NewForm(
 		l.Name,
 		l.Version,
@@ -49,6 +37,16 @@ func InitLateral(packager pkg.Packager) *Lateral {
 		l.Local,
 		l.Repo,
 	)
-	l.Hide()
-	return l
+}
+
+func (l *Lateral) Load(p pkg.Packager) {
+	setText := func(fi *widget.FormItem, txt ...any) {
+		fi.Widget.(*widget.Label).SetText(fmt.Sprint(txt...))
+	}
+	setText(l.Name, p.Name())
+	setText(l.Version, p.Version())
+	setText(l.Installed, p.Installed())
+	setText(l.Manager, p.Manager().Name())
+	setText(l.Local, p.Local())
+	setText(l.Repo, p.Repo())
 }

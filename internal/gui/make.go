@@ -37,7 +37,7 @@ func (ui *ui) MakeList(pkgs []pkg.Packager) *widget.List {
 	)
 }
 
-func (ui *ui) MakePkgList(m pkg.Managerer) []pkg.Packager {
+func (ui *ui) MakePkgSlice(m pkg.Managerer) []pkg.Packager {
 	pkgs, err := m.LocalPkgs()
 	if err != nil {
 		popups.FatalError(err)
