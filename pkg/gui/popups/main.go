@@ -5,11 +5,13 @@ import (
 	"log"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
+	boxes "fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GoNotes/pkg/messages"
 	"github.com/ncruces/zenity"
 )
+
+var runningFatal bool
 
 func baseError(onAccept func(), e ...any) {
 	app := fyne.CurrentApp()
@@ -26,10 +28,14 @@ func baseError(onAccept func(), e ...any) {
 
 	w := app.NewWindow("Error")
 
-	errTitle := widget.NewLabel("Error")
-	errTitle.Alignment = fyne.TextAlignCenter
+	errTitle := boxes.NewCenter(widget.NewRichTextFromMarkdown("# Error"))
 
-	errText := widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", fmt.Sprint(e...)))
+	errText := &widget.Label{
+		Text:      fmt.Sprint(e...),
+		TextStyle: fyne.TextStyle{Bold: true},
+		Alignment: fyne.TextAlignCenter,
+	}
+
 	acceptButton := widget.NewButton("Accept", func() {
 		w.Close()
 		if onAccept != nil {
@@ -37,8 +43,8 @@ func baseError(onAccept func(), e ...any) {
 		}
 	})
 
-	textBox := container.NewBorder(errTitle, nil, nil, nil, errText)
-	content := container.NewBorder(nil, acceptButton, nil, nil, textBox)
+	textBox := boxes.NewBorder(errTitle, nil, nil, nil, errText)
+	content := boxes.NewBorder(nil, acceptButton, nil, nil, textBox)
 
 	w.SetContent(content)
 	w.Show()
@@ -49,6 +55,10 @@ func Error(e ...any) {
 }
 
 func FatalError(e ...any) {
+	if runningFatal {
+		return
+	}
+	runningFatal = true
 	baseError(func() {
 		log.Fatal()
 	}, e...)

@@ -3,6 +3,7 @@ package gui
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
@@ -14,13 +15,12 @@ type ui struct {
 	app fyne.App
 
 	manager pkg.Managerer
-	pkgList *widget.List
+	pkgList struct {
+		*widget.List
+		pkgs []pkg.Packager
+	}
 
 	window fyne.Window
-
-	lateralMenu        *fyne.Container
-	lateralMenuContent struct {
-	}
 }
 
 func InitGUI() {
@@ -30,6 +30,7 @@ func InitGUI() {
 		app:    app,
 		window: app.NewWindow("Graphic Windows Package Manager"),
 	}
+	// Init Utils.
 	ui.InitManager()
 	ui.InitList()
 	ui.InitContent()
@@ -46,13 +47,16 @@ func (ui *ui) InitManager() {
 }
 
 func (ui *ui) InitList() {
-	l, err := ui.MakeList(ui.manager)
-	if err != nil {
-		popups.FatalError(err)
+	ui.pkgList.pkgs = ui.MakePkgList(ui.manager)
+	ui.pkgList.List = ui.MakeList(ui.pkgList.pkgs)
+	ui.pkgList.OnSelected = func(id widget.ListItemID) {
+		ui.lateral = InitLateral(ui.pkgList.pkgs[id])
+		ui.lateral.Show()
 	}
-	ui.pkgList = l
 }
 
 func (ui *ui) InitContent() {
-	ui.window.SetContent(ui.pkgList)
+	ui.lateral.Form = widget.NewForm()
+	content := container.NewBorder(nil, nil, nil, ui.lateral, ui.pkgList)
+	ui.window.SetContent(content)
 }

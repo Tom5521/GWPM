@@ -5,6 +5,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/choco"
+	"github.com/Tom5521/GWPM/pkg/gui/popups"
 	"github.com/Tom5521/GWPM/pkg/scoop"
 )
 
@@ -26,18 +27,20 @@ func (ui *ui) MakeManager() (pkg.Managerer, error) {
 	return m, nil
 }
 
-func (ui *ui) MakeList(manager pkg.Managerer) (*widget.List, error) {
-	l := &widget.List{}
-	pkgs, err := manager.LocalPkgs()
-	if err != nil {
-		return l, err
-	}
-	l = widget.NewList(
+func (ui *ui) MakeList(pkgs []pkg.Packager) *widget.List {
+	return widget.NewList(
 		func() int { return len(pkgs) },
 		func() fyne.CanvasObject { return &widget.Label{} },
 		func(lii widget.ListItemID, co fyne.CanvasObject) {
 			co.(*widget.Label).SetText(pkgs[lii].Name())
 		},
 	)
-	return l, nil
+}
+
+func (ui *ui) MakePkgList(m pkg.Managerer) []pkg.Packager {
+	pkgs, err := m.LocalPkgs()
+	if err != nil {
+		popups.FatalError(err)
+	}
+	return pkgs
 }
