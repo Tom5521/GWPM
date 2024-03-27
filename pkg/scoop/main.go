@@ -8,7 +8,7 @@ import (
 
 func Connect() *Manager {
 	return &Manager{
-		name:         "Scoop",
+		name:         ManagerName,
 		requireAdmin: false,
 		isInstalled: func() bool {
 			_, err := exec.LookPath("scoop")

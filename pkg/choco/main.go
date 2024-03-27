@@ -9,7 +9,7 @@ import (
 // NOTE:Choco is fucking slow.
 func Connect() *Manager {
 	return &Manager{
-		name:         "Choco",
+		name:         ManagerName,
 		requireAdmin: true,
 		isInstalled: func() bool {
 			_, err := exec.LookPath("choco")

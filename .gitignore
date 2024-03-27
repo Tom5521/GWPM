@@ -2,3 +2,4 @@ vendor
 *.exe
 *_skip.*
 *.test*
+builds

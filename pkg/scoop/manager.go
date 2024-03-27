@@ -10,6 +10,8 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
+const ManagerName = "Scoop"
+
 type Manager struct {
 	name         string
 	isInstalled  bool
