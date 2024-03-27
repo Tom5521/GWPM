@@ -29,8 +29,7 @@ func baseError(onAccept func(), e ...any) {
 	errTitle := widget.NewLabel("Error")
 	errTitle.Alignment = fyne.TextAlignCenter
 
-	errText := widget.NewRichTextFromMarkdown(fmt.Sprintf("*%s*", fmt.Sprint(e...)))
-
+	errText := widget.NewRichTextFromMarkdown(fmt.Sprintf("**%s**", fmt.Sprint(e...)))
 	acceptButton := widget.NewButton("Accept", func() {
 		w.Close()
 		if onAccept != nil {
@@ -39,7 +38,6 @@ func baseError(onAccept func(), e ...any) {
 	})
 
 	textBox := container.NewBorder(errTitle, nil, nil, nil, errText)
-
 	content := container.NewBorder(nil, acceptButton, nil, nil, textBox)
 
 	w.SetContent(content)
