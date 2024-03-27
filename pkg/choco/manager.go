@@ -9,7 +9,7 @@ import (
 	"github.com/Tom5521/GWPM/pkg/term"
 )
 
-const ManagerName = "Choco"
+const ManagerName = "Chocolatey"
 
 // TODO:Document this.
 type Manager struct {
