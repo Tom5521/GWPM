@@ -2,12 +2,11 @@ package popups
 
 import (
 	"fmt"
-	"log"
 
 	"fyne.io/fyne/v2"
 	boxes "fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/Tom5521/GoNotes/pkg/messages"
+	msg "github.com/Tom5521/GoNotes/pkg/messages"
 	"github.com/ncruces/zenity"
 )
 
@@ -18,8 +17,8 @@ func baseError(onAccept func(), e ...any) {
 	if app == nil {
 		err := zenity.Error(fmt.Sprint(e...))
 		if err != nil {
-			messages.Warning(err)
-			messages.Error(e...)
+			msg.Warning(err)
+			msg.Error(e...)
 		}
 		if onAccept != nil {
 			onAccept()
@@ -51,7 +50,9 @@ func baseError(onAccept func(), e ...any) {
 }
 
 func Error(e ...any) {
-	baseError(nil, e...)
+	baseError(func() {
+		msg.Error(e...)
+	}, e...)
 }
 
 func FatalError(e ...any) {
@@ -60,6 +61,6 @@ func FatalError(e ...any) {
 	}
 	runningFatal = true
 	baseError(func() {
-		log.Fatal()
+		msg.FatalError(e...)
 	}, e...)
 }

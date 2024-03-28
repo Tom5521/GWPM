@@ -32,6 +32,7 @@ func InitGUI() {
 		app:    app,
 		window: app.NewWindow("Graphic Windows Package Manager"),
 	}
+	ui.window.SetMaster()
 	ui.window.Resize(fyne.NewSize(828, 390))
 	// Init Utils.
 	ui.InitManager()
