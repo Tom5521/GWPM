@@ -16,6 +16,7 @@ var (
 type Packager interface {
 	Install() error
 	Uninstall() error
+	Reinstall() error
 	Version() string
 	Name() string
 	Installed() bool

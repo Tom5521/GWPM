@@ -4,7 +4,6 @@ import (
 	"github.com/Tom5521/GWPM/pkg"
 )
 
-// TODO:Finish this.
 type Package struct {
 	name    string
 	version string
@@ -22,6 +21,10 @@ func (p *Package) Install() error {
 
 func (p *Package) Uninstall() error {
 	return p.manager.Uninstall(p)
+}
+
+func (p *Package) Reinstall() error {
+	return p.Install()
 }
 
 func (p *Package) Version() string {
