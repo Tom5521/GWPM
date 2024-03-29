@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"reflect"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -73,18 +74,72 @@ func InitGUI() {
 	}
 
 	var sideBarItems struct {
-		Name    *widget.FormItem
-		Version *widget.FormItem
+		currentPkg pkg.Packager
+
+		Name      *widget.FormItem
+		Version   *widget.FormItem
+		Installed *widget.FormItem
+		Manager   *widget.FormItem
+		Local     *widget.FormItem
+		Repo      *widget.FormItem
+
+		loadingBar *widget.ProgressBar
 	}
+	sideBarItems.loadingBar = widget.NewProgressBar()
+	sideBarItems.loadingBar.Hide()
 	sideBarItems.Name = newFI("Name:")
 	sideBarItems.Version = newFI("Version:")
+	sideBarItems.Installed = newFI("Installed:")
+	sideBarItems.Manager = newFI("Manager:")
+	sideBarItems.Local = newFI("Local:")
+	sideBarItems.Repo = newFI("Repo:")
+
 	loadSidebar := func(p pkg.Packager) {
+		if reflect.DeepEqual(p, sideBarItems.currentPkg) {
+			return
+		}
+		sideBarItems.currentPkg = p
+
 		setText := func(fi *widget.FormItem, txt ...any) {
 			fi.Widget.(interface{ SetText(string) }).SetText(fmt.Sprint(txt...))
+			if sideBarItems.loadingBar.Hidden {
+				sideBarItems.loadingBar.Show()
+			}
+			sideBarItems.loadingBar.SetValue(sideBarItems.loadingBar.Value + (1.0 / 6.0))
 		}
-		setText(sideBarItems.Name, p.Name())
-		setText(sideBarItems.Version, p.Name())
+		func() {
+			loadTxt := "loading..."
+			clean := func(fi *widget.FormItem) {
+				fi.Widget.(interface{ SetText(string) }).SetText(loadTxt)
+			}
+			clean(sideBarItems.Name)
+			clean(sideBarItems.Version)
+			clean(sideBarItems.Manager)
+			clean(sideBarItems.Local)
+			clean(sideBarItems.Repo)
+			clean(sideBarItems.Installed)
+		}()
+
+		go func() {
+			setText(sideBarItems.Name, p.Name())
+			setText(sideBarItems.Version, p.Version())
+			setText(sideBarItems.Manager, p.Manager().Name())
+			setText(sideBarItems.Local, p.Local())
+			setText(sideBarItems.Repo, p.Repo())
+			setText(sideBarItems.Installed, p.Installed())
+
+			sideBarItems.loadingBar.Hide()
+			sideBarItems.loadingBar.SetValue(0)
+		}()
 	}
+	sideBar := widget.NewForm(
+		sideBarItems.Name,
+		sideBarItems.Version,
+		sideBarItems.Installed,
+		sideBarItems.Manager,
+		sideBarItems.Local,
+		sideBarItems.Repo,
+	)
 
 	pkgList := widget.NewList(
 		func() int { return len(pkgs) },
@@ -93,12 +148,13 @@ func InitGUI() {
 		},
 		func(lii widget.ListItemID, co fyne.CanvasObject) {
 			c := co.(*fyne.Container)
-			check := c.Objects[0].(*widget.Check)
+			label := c.Objects[0].(*widget.Label)
+			label.SetText(pkgs[lii].Name())
+
+			check := c.Objects[1].(*widget.Check)
 			check.OnChanged = func(b bool) {
 				pkgs[lii].Checked = b
 			}
-			label := c.Objects[1].(*widget.Label)
-			label.SetText(pkgs[lii].Name())
 		},
 	)
 	pkgList.OnSelected = func(id widget.ListItemID) {
@@ -106,14 +162,17 @@ func InitGUI() {
 		pkgList.UnselectAll()
 	}
 
-	sideBar := widget.NewForm(
-		sideBarItems.Name,
-		sideBarItems.Version,
-	)
 	topBar := boxes.NewHBox()
 
+	sideBarBox := boxes.NewBorder(nil, nil, widget.NewSeparator(), nil,
+		boxes.NewVBox(
+			sideBar,
+			sideBarItems.loadingBar,
+		),
+	)
+
 	// Main Content
-	var mcontent = boxes.NewBorder(topBar, nil, nil, sideBar, pkgList)
+	var mcontent = boxes.NewBorder(topBar, nil, nil, sideBarBox, pkgList)
 
 	mw.SetContent(mcontent)
 	mw.ShowAndRun()
