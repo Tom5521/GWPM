@@ -68,8 +68,7 @@ func InitGUI() {
 	}
 	updatePkgs()
 
-	// New Form Item
-	var newFI = func(title any, text ...any) *widget.FormItem {
+	newFormItem := func(title any, text ...any) *widget.FormItem {
 		return widget.NewFormItem(fmt.Sprint(title), widget.NewLabel(fmt.Sprint(text...)))
 	}
 
@@ -87,12 +86,12 @@ func InitGUI() {
 	}
 	sideBarItems.loadingBar = widget.NewProgressBar()
 	sideBarItems.loadingBar.Hide()
-	sideBarItems.Name = newFI("Name:")
-	sideBarItems.Version = newFI("Version:")
-	sideBarItems.Installed = newFI("Installed:")
-	sideBarItems.Manager = newFI("Manager:")
-	sideBarItems.Local = newFI("Local:")
-	sideBarItems.Repo = newFI("Repo:")
+	sideBarItems.Name = newFormItem("Name:")
+	sideBarItems.Version = newFormItem("Version:")
+	sideBarItems.Installed = newFormItem("Installed:")
+	sideBarItems.Manager = newFormItem("Manager:")
+	sideBarItems.Local = newFormItem("Local:")
+	sideBarItems.Repo = newFormItem("Repo:")
 
 	loadSidebar := func(p pkg.Packager) {
 		if reflect.DeepEqual(p, sideBarItems.currentPkg) {
