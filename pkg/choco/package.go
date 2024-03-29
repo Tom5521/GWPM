@@ -56,8 +56,8 @@ func (p *Package) Installed() bool {
 }
 
 func (p *Package) Local() bool {
-	return p.Installed()
+	return p.local
 }
 func (p *Package) Repo() bool {
-	return !p.Installed()
+	return p.repo
 }
