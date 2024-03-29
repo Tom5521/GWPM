@@ -1,9 +1,11 @@
 package gui
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
+	boxes "fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/choco"
@@ -65,10 +67,29 @@ func InitGUI() {
 	}
 	updatePkgs()
 
+	// New Form Item
+	var newFI = func(title any, text ...any) *widget.FormItem {
+		return widget.NewFormItem(fmt.Sprint(title), widget.NewLabel(fmt.Sprint(text...)))
+	}
+
+	var sideBarItems struct {
+		Name    *widget.FormItem
+		Version *widget.FormItem
+	}
+	sideBarItems.Name = newFI("Name:")
+	sideBarItems.Version = newFI("Version:")
+	loadSidebar := func(p pkg.Packager) {
+		setText := func(fi *widget.FormItem, txt ...any) {
+			fi.Widget.(interface{ SetText(string) }).SetText(fmt.Sprint(txt...))
+		}
+		setText(sideBarItems.Name, p.Name())
+		setText(sideBarItems.Version, p.Name())
+	}
+
 	pkgList := widget.NewList(
 		func() int { return len(pkgs) },
 		func() fyne.CanvasObject {
-			return container.NewBorder(nil, nil, nil, &widget.Check{}, &widget.Label{})
+			return boxes.NewBorder(nil, nil, nil, &widget.Check{}, &widget.Label{})
 		},
 		func(lii widget.ListItemID, co fyne.CanvasObject) {
 			c := co.(*fyne.Container)
@@ -80,12 +101,19 @@ func InitGUI() {
 			label.SetText(pkgs[lii].Name())
 		},
 	)
+	pkgList.OnSelected = func(id widget.ListItemID) {
+		loadSidebar(pkgs[id].Packager)
+		pkgList.UnselectAll()
+	}
 
-	sideBar := widget.NewForm()
-	topBar := widget.NewToolbar()
+	sideBar := widget.NewForm(
+		sideBarItems.Name,
+		sideBarItems.Version,
+	)
+	topBar := boxes.NewHBox()
 
 	// Main Content
-	var mcontent = container.NewBorder(topBar, nil, nil, sideBar, pkgList)
+	var mcontent = boxes.NewBorder(topBar, nil, nil, sideBar, pkgList)
 
 	mw.SetContent(mcontent)
 	mw.ShowAndRun()
