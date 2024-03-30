@@ -78,6 +78,20 @@ func (m *Manager) RequireAdmin() bool {
 	return m.requireAdmin
 }
 
+func (m *Manager) makePkgList(list string, onIteration func(name, version string) *Package) []pkg.Packager {
+	var pkgs []pkg.Packager
+	// strings.Split > regex
+	lines := strings.Split(list, "\n")
+	for _, line := range lines {
+		p := strings.SplitN(line, "|", 2)
+		if len(p) < 2 {
+			continue
+		}
+		pkgs = append(pkgs, onIteration(p[0], p[1]))
+	}
+	return pkgs
+}
+
 func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
 	if !m.isInstalled {
@@ -87,20 +101,15 @@ func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	if err != nil {
 		return pkgs, err
 	}
-	// strings.Split > regex
-	lines := strings.Split(out, "\n")
-	for _, line := range lines {
-		p := strings.SplitN(line, "|", 2)
-		if len(p) < 2 {
-			continue
-		}
-		pkgs = append(pkgs, &Package{
-			name:    p[0],
-			version: p[1],
+
+	pkgs = m.makePkgList(out, func(name, version string) *Package {
+		return &Package{
+			name:    name,
+			version: version,
 			manager: m,
 			local:   true,
-		})
-	}
+		}
+	})
 
 	return pkgs, nil
 }
@@ -181,19 +190,14 @@ func (m *Manager) SearchInRepo(pkgName string) ([]pkg.Packager, error) {
 		return pkgs, err
 	}
 
-	lines := strings.Split(out, "\n")
-	for _, line := range lines {
-		p := strings.SplitN(line, "|", 2)
-		if len(p) < 2 {
-			continue
-		}
-		pkgs = append(pkgs, &Package{
-			name:    p[0],
-			version: p[1],
-			manager: m,
+	pkgs = m.makePkgList(out, func(name, version string) *Package {
+		return &Package{
+			name:    name,
+			version: version,
 			repo:    true,
-		})
-	}
+			manager: m,
+		}
+	})
 
 	var strPkgs []string
 	for _, p := range pkgs {
