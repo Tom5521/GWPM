@@ -6,6 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.4.4
 	github.com/Tom5521/GoNotes v1.3.0
 	github.com/ncruces/zenity v0.10.12
+	github.com/sahilm/fuzzy v0.1.1
 )
 
 require (
@@ -27,9 +28,9 @@ require (
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/josephspurrier/goversioninfo v1.4.0 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/randall77/makefat v0.0.0-20210315173500-7ddd0e42c844 // indirect
-	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c // indirect
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
