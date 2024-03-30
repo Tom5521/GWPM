@@ -54,26 +54,120 @@ func InitGUI() {
 		Checked bool
 	}
 
+	var pkgList *widget.List
+	searchProgress := widget.NewProgressBarInfinite()
+	searchProgress.Start()
+	searchProgress.Hide()
+	searchEntry := widget.NewEntry()
+
 	var pkgs []packager
 	updatePkgs := func() {
-		packagers, err := m.LocalPkgs()
+		searchProgress.Show()
+		var (
+			packagers []pkg.Packager
+			err       error
+		)
+		switch settings.String("list-mode") {
+		case "local":
+			packagers, err = m.LocalPkgs()
+		case "repo":
+			packagers, err = m.SearchInRepo(searchEntry.Text)
+		default:
+			settings.SetString("list-mode", "local")
+			packagers, err = m.LocalPkgs()
+		}
 		if err != nil {
 			popups.FatalError(err)
 		}
+		pkgs = []packager{}
 		for _, p := range packagers {
 			pkgs = append(pkgs, packager{
 				Packager: p,
 			})
 		}
+		searchProgress.Hide()
 	}
 	updatePkgs()
 
+	searchButton := widget.NewButton("Search", func() {
+		switch settings.String("list-mode") {
+		case "local":
+			searchProgress.Show()
+			if searchEntry.Text == "" {
+				lpkgs, err := m.LocalPkgs()
+				if err != nil {
+					popups.Error(err)
+					return
+				}
+				pkgs = []packager{}
+				for _, p := range lpkgs {
+					pkgs = append(pkgs, packager{Packager: p})
+				}
+				searchProgress.Hide()
+				return
+			}
+			lpkgs, err := m.SearchInLocal(searchEntry.Text)
+			if err != nil {
+				popups.Error(err)
+				return
+			}
+			pkgs = []packager{}
+			for _, lpkg := range lpkgs {
+				pkgs = append(pkgs, packager{
+					Packager: lpkg,
+				})
+			}
+			searchProgress.Hide()
+		case "repo":
+			searchProgress.Show()
+			rpkgs, err := m.SearchInRepo(searchEntry.Text)
+			if err != nil {
+				popups.Error(err)
+				return
+			}
+			pkgs = []packager{}
+			for _, rpkg := range rpkgs {
+				pkgs = append(pkgs, packager{
+					Packager: rpkg,
+				})
+			}
+			searchProgress.Hide()
+		}
+	})
+
+	searchBox := boxes.NewBorder(nil, nil, nil, searchButton, searchEntry)
+
+	listModeSelect := widget.NewSelect([]string{"Local", "Repository"}, func(s string) {
+		switch s {
+		case "Local":
+			settings.SetString("list-mode", "local")
+		case "Repository":
+			settings.SetString("list-mode", "repo")
+		}
+		updatePkgs()
+	})
+	listModeSelect.SetSelectedIndex(func() int {
+		switch settings.String("list-mode") {
+		case "local":
+			return 0
+		case "repo":
+			return 1
+		default:
+			return 0
+		}
+	}())
+
+	// SIDE BAR START
 	newFormItem := func(title any, text ...any) *widget.FormItem {
 		return widget.NewFormItem(fmt.Sprint(title), widget.NewLabel(fmt.Sprint(text...)))
 	}
 
+	var sideBar *widget.Form
+	var sideBarBox *fyne.Container
 	var sideBarItems struct {
 		currentPkg pkg.Packager
+
+		Slice []*widget.FormItem
 
 		Name      *widget.FormItem
 		Version   *widget.FormItem
@@ -82,8 +176,11 @@ func InitGUI() {
 		Local     *widget.FormItem
 		Repo      *widget.FormItem
 
+		closeBtn *widget.Button
+
 		loadingBar *widget.ProgressBar
 	}
+
 	sideBarItems.loadingBar = widget.NewProgressBar()
 	sideBarItems.loadingBar.Hide()
 	sideBarItems.Name = newFormItem("Name:")
@@ -93,11 +190,39 @@ func InitGUI() {
 	sideBarItems.Local = newFormItem("Local:")
 	sideBarItems.Repo = newFormItem("Repo:")
 
+	sideBarItems.Slice = append(sideBarItems.Slice,
+		sideBarItems.Name,
+		sideBarItems.Version,
+		sideBarItems.Installed,
+		sideBarItems.Manager,
+		sideBarItems.Local,
+		sideBarItems.Repo,
+	)
+
+	cleanSideBar := func() {
+		loadTxt := "loading..."
+		clean := func(fi *widget.FormItem) {
+			fi.Widget.(interface{ SetText(string) }).SetText(loadTxt)
+		}
+		for _, i := range sideBarItems.Slice {
+			clean(i)
+		}
+	}
+
+	sideBarItems.closeBtn = widget.NewButton("Close", func() {
+		cleanSideBar()
+		sideBarBox.Hide()
+	})
+
 	loadSidebar := func(p pkg.Packager) {
 		if reflect.DeepEqual(p, sideBarItems.currentPkg) {
 			return
 		}
 		sideBarItems.currentPkg = p
+
+		if sideBarBox.Hidden {
+			sideBarBox.Show()
+		}
 
 		setText := func(fi *widget.FormItem, txt ...any) {
 			fi.Widget.(interface{ SetText(string) }).SetText(fmt.Sprint(txt...))
@@ -106,18 +231,8 @@ func InitGUI() {
 			}
 			sideBarItems.loadingBar.SetValue(sideBarItems.loadingBar.Value + (1.0 / 6.0))
 		}
-		func() {
-			loadTxt := "loading..."
-			clean := func(fi *widget.FormItem) {
-				fi.Widget.(interface{ SetText(string) }).SetText(loadTxt)
-			}
-			clean(sideBarItems.Name)
-			clean(sideBarItems.Version)
-			clean(sideBarItems.Manager)
-			clean(sideBarItems.Local)
-			clean(sideBarItems.Repo)
-			clean(sideBarItems.Installed)
-		}()
+
+		cleanSideBar()
 
 		go func() {
 			setText(sideBarItems.Name, p.Name())
@@ -131,16 +246,9 @@ func InitGUI() {
 			sideBarItems.loadingBar.SetValue(0)
 		}()
 	}
-	sideBar := widget.NewForm(
-		sideBarItems.Name,
-		sideBarItems.Version,
-		sideBarItems.Installed,
-		sideBarItems.Manager,
-		sideBarItems.Local,
-		sideBarItems.Repo,
-	)
+	sideBar = widget.NewForm(sideBarItems.Slice...)
 
-	pkgList := widget.NewList(
+	pkgList = widget.NewList(
 		func() int { return len(pkgs) },
 		func() fyne.CanvasObject {
 			return boxes.NewBorder(nil, nil, nil, &widget.Check{}, &widget.Label{})
@@ -161,12 +269,21 @@ func InitGUI() {
 		pkgList.UnselectAll()
 	}
 
-	topBar := boxes.NewHBox()
-
-	sideBarBox := boxes.NewBorder(nil, nil, widget.NewSeparator(), nil,
+	sideBarBox = boxes.NewBorder(nil, nil, widget.NewSeparator(), nil,
 		boxes.NewVBox(
 			sideBar,
 			sideBarItems.loadingBar,
+			sideBarItems.closeBtn,
+		),
+	)
+	sideBarBox.Hide()
+
+	// SIDE BAR END
+
+	topBar := boxes.NewBorder(nil, nil, listModeSelect, nil,
+		boxes.NewVBox(
+			searchProgress,
+			searchBox,
 		),
 	)
 
