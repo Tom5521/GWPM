@@ -25,7 +25,7 @@ func TestGetPkgs(t *testing.T) {
 }
 
 func TestSearchPkgs(t *testing.T) {
-	pkgs, err := m.Search("go")
+	pkgs, err := m.SearchInRepo("go")
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()

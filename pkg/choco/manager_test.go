@@ -38,6 +38,23 @@ func TestInstallPkgs(t *testing.T) {
 	TestInstalledPkgs(t)
 }
 
+func TestLocalSearch(t *testing.T) {
+	pkgs, err := m.SearchInLocal("sudo") // g -> gsudo
+	if err != nil {
+		fmt.Println(err)
+		t.Fail()
+		return
+	}
+	if len(pkgs) == 0 {
+		fmt.Println("pkgs len is 0!")
+		t.Fail()
+	}
+	for _, p := range pkgs {
+		fmt.Printf("%s", p.Name())
+	}
+	fmt.Println()
+}
+
 func TestUninstallPkgs(t *testing.T) {
 	err := m.UninstallByName("gsudo")
 	if err != nil {
@@ -51,13 +68,13 @@ func TestFinalPkgs(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	pkgs, err := m.Search("vscode")
+	pkgs, err := m.SearchInRepo("vscode")
 	if err != nil {
 		fmt.Println(err)
 		t.Fail()
 	}
 	if len(pkgs) == 0 {
-		fmt.Println("pkg len is 0!")
+		fmt.Println("pkgs len is 0!")
 		t.Fail()
 	}
 	for _, p := range pkgs {

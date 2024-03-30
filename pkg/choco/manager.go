@@ -7,6 +7,8 @@ import (
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/perm"
 	"github.com/Tom5521/GWPM/pkg/term"
+
+	"github.com/sahilm/fuzzy"
 )
 
 const ManagerName = "Chocolatey"
@@ -105,7 +107,7 @@ func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 
 func (m *Manager) RepoPkgByName(name string) (pkg.Packager, error) {
 	var lpkg *Package
-	s, err := m.Search(name)
+	s, err := m.SearchInRepo(name)
 	if err != nil {
 		return lpkg, err
 	}
@@ -148,7 +150,26 @@ func (m *Manager) IsInstalled() bool {
 	return m.isInstalled
 }
 
-func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
+func (m *Manager) SearchInLocal(p string) ([]pkg.Packager, error) {
+	var spkgs []string
+	ipkgs, err := m.LocalPkgs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ip := range ipkgs {
+		spkgs = append(spkgs, ip.Name())
+	}
+	var results []pkg.Packager
+
+	findResults := fuzzy.Find(p, spkgs)
+	for _, r := range findResults {
+		results = append(results, ipkgs[r.Index])
+	}
+	return results, nil
+}
+
+func (m *Manager) SearchInRepo(pkgName string) ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
 	if !m.isInstalled {
 		return pkgs, pkg.ErrManagerNotInstalled
@@ -174,11 +195,21 @@ func (m *Manager) Search(pkgName string) ([]pkg.Packager, error) {
 		})
 	}
 
-	return pkgs, nil
+	var strPkgs []string
+	for _, p := range pkgs {
+		strPkgs = append(strPkgs, p.Name())
+	}
+	matches := fuzzy.Find(pkgName, strPkgs)
+	var results []pkg.Packager
+	for _, match := range matches {
+		results = append(results, pkgs[match.Index])
+	}
+
+	return results, nil
 }
 
 func (m *Manager) IsInRepo(pkg pkg.Packager) bool {
-	repoPkgs, err := m.Search(pkg.Name())
+	repoPkgs, err := m.SearchInRepo(pkg.Name())
 	if err != nil {
 		return false
 	}

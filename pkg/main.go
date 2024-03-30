@@ -39,7 +39,8 @@ type Managerer interface {
 	RepoPkgByName(string) (Packager, error)
 	LocalPkgByName(string) (Packager, error)
 	IsInstalled() bool
-	Search(string) ([]Packager, error)
+	SearchInRepo(string) ([]Packager, error)
+	SearchInLocal(string) ([]Packager, error)
 	IsInRepo(Packager) bool
 	IsInLocal(Packager) bool
 }
