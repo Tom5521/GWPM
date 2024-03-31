@@ -26,8 +26,8 @@ type ui struct {
 
 	manager pkg.Managerer
 
-	searchBar *Search
-	sideBar   *SideBar
+	search  *Search
+	sideBar *SideBar
 
 	packages []packager
 	list     *widget.List
@@ -40,6 +40,8 @@ func InitGUI() {
 	cui = &ui{
 		app:      app,
 		settings: app.Preferences(),
+		sideBar:  &SideBar{},
+		search:   &Search{},
 	}
 	cui.mainWindow = app.NewWindow("Graphic Windows Package Manager")
 	cui.mainWindow.SetMaster()
@@ -47,9 +49,9 @@ func InitGUI() {
 
 	// Init methods.
 	cui.InitManager()
-	cui.sideBar = InitSidebar()
-	cui.searchBar = InitSearch()
-	cui.searchBar.InitSelect()
+	cui.sideBar.Init()
+	cui.search.Init()
+	cui.search.InitSelect()
 	cui.InitList()
 	cui.InitBoxes()
 
@@ -78,7 +80,7 @@ func (ui *ui) InitPkgSlice() {
 	case "local":
 		packagers, err = ui.manager.LocalPkgs()
 	case "repo":
-		packagers, err = ui.manager.SearchInRepo(ui.searchBar.Entry.Text)
+		packagers, err = ui.manager.SearchInRepo(ui.search.Entry.Text)
 	default:
 		ui.settings.SetString("list-mode", "local")
 		packagers, err = ui.manager.LocalPkgs()
@@ -118,5 +120,5 @@ func (ui *ui) InitList() {
 }
 
 func (ui *ui) InitBoxes() {
-	ui.mainBox = boxes.NewBorder(ui.searchBar.Box, nil, nil, ui.sideBar.Box, ui.list)
+	ui.mainBox = boxes.NewBorder(ui.search.Box, nil, nil, ui.sideBar.Box, ui.list)
 }

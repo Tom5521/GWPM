@@ -31,8 +31,7 @@ func (s *Search) toggleLoading() {
 	s.Charge.Button.Hide()
 }
 
-func InitSearch() *Search {
-	s := &Search{}
+func (s *Search) Init() *Search {
 	s.Entry = widget.NewEntry()
 
 	s.Charge.LoadBar = widget.NewProgressBarInfinite()
@@ -47,14 +46,13 @@ func InitSearch() *Search {
 			cpkgs []pkg.Packager
 		)
 
-		switch cui.settings.String("list-mode") {
-		case "local":
+		if cui.settings.String("list-mode") == "local" {
 			if s.Entry.Text == "" {
 				cpkgs, err = cui.manager.LocalPkgs()
 			} else {
 				cpkgs, err = cui.manager.SearchInLocal(s.Entry.Text)
 			}
-		case "repo":
+		} else {
 			if s.Entry.Text == "" {
 				cpkgs = []pkg.Packager{}
 			} else {
