@@ -21,6 +21,7 @@ type ui struct {
 	app      fyne.App
 	settings fyne.Preferences
 
+	mainMenu   *MainMenu
 	mainWindow fyne.Window
 	mainBox    *fyne.Container
 
@@ -40,20 +41,25 @@ func InitGUI() {
 	cui = &ui{
 		app:      app,
 		settings: app.Preferences(),
-		sideBar:  &SideBar{},
-		search:   &Search{},
+
+		// Initialize structures.
+		sideBar:  new(SideBar),
+		search:   new(Search),
+		mainMenu: new(MainMenu),
 	}
 	cui.mainWindow = app.NewWindow("Graphic Windows Package Manager")
 	cui.mainWindow.SetMaster()
 	cui.mainWindow.Resize(fyne.NewSize(830, 390))
 
-	// Init methods.
+	// Initialize methods.
 	cui.InitManager()
 	cui.sideBar.Init()
 	cui.search.Init()
 	cui.search.InitSelect()
 	cui.InitList()
 	cui.InitBoxes()
+	cui.mainMenu.Init()
+	cui.mainWindow.SetMainMenu(cui.mainMenu.Menu)
 
 	cui.mainWindow.SetContent(cui.mainBox)
 	cui.mainWindow.ShowAndRun()
@@ -111,6 +117,7 @@ func (ui *ui) InitList() {
 			check.OnChanged = func(b bool) {
 				ui.packages[lii].Checked = b
 			}
+			check.SetChecked(ui.packages[lii].Checked)
 		},
 	)
 	ui.list.OnSelected = func(id widget.ListItemID) {
