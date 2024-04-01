@@ -51,7 +51,7 @@ func baseError(onAccept func(), e ...any) {
 
 func Error(e ...any) {
 	baseError(func() {
-		msg.Error(e...)
+		go msg.Error(e...)
 	}, e...)
 }
 
@@ -61,6 +61,6 @@ func FatalError(e ...any) {
 	}
 	runningFatal = true
 	baseError(func() {
-		msg.FatalError(e...)
+		go msg.FatalError(e...)
 	}, e...)
 }
