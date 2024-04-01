@@ -42,29 +42,33 @@ func (m *MainMenu) Init() {
 				}
 			}),
 			fyne.NewMenuItem("Install selected", func() {
-				for i := range cui.list.Length() {
-					p := cui.packages[i]
-					if !p.Checked {
-						continue
-					}
-					err := p.Install()
-					if err != nil {
-						popups.Error(err)
-					}
+				cui.search.toggleLoading()
+				pkgs := checkedPkgs()
+				err := cui.manager.InstallByName(pkgs...)
+				if err != nil {
+					popups.Error(err)
 				}
+				cui.search.toggleLoading()
 			}),
 			fyne.NewMenuItem("Uninstall selected", func() {
-				for i := range cui.list.Length() {
-					p := cui.packages[i]
-					if !p.Checked {
-						continue
-					}
-					err := p.Uninstall()
-					if err != nil {
-						popups.Error(err)
-					}
+				cui.search.toggleLoading()
+				pkgs := checkedPkgs()
+				err := cui.manager.UninstallByName(pkgs...)
+				if err != nil {
+					popups.Error(err)
 				}
+				cui.search.toggleLoading()
 			}),
 		),
 	)
+}
+
+func checkedPkgs() []string {
+	var pkgs []string
+	for _, p := range cui.packages {
+		if p.Checked {
+			pkgs = append(pkgs, p.Name())
+		}
+	}
+	return pkgs
 }
