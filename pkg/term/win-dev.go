@@ -14,16 +14,10 @@ func (c *Command) Make() *exec.Cmd {
 	// TODO:Improve this....?
 	if c.Hide {
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	} else {
-		if c.Stdout {
-			cmd.Stdout = os.Stdout
-		}
-		if c.Stderr {
-			cmd.Stderr = os.Stderr
-		}
-		if c.Stdin {
-			cmd.Stdin = os.Stdin
-		}
 	}
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+
 	return cmd
 }

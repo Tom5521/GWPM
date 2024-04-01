@@ -1,6 +1,10 @@
 package term
 
-import msg "github.com/Tom5521/GoNotes/pkg/messages"
+import (
+	"fmt"
+
+	msg "github.com/Tom5521/GoNotes/pkg/messages"
+)
 
 func NewCommand(bin string, args ...string) *Command {
 	cmd := &Command{
@@ -27,7 +31,10 @@ func (c *Command) Run() error {
 
 func (c *Command) Output() (string, error) {
 	cmd := c.Make()
-	out, err := cmd.CombinedOutput()
+	cmd.Stdout = nil
+	cmd.Stderr = nil
 	msg.Info("Running ", cmd)
+	out, err := cmd.CombinedOutput()
+	fmt.Println(string(out))
 	return string(out), err
 }

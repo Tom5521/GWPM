@@ -16,11 +16,11 @@ type Package struct {
 }
 
 func (p *Package) Install() error {
-	return p.manager.Install(p)
+	return p.manager.InstallByName(p.Name())
 }
 
 func (p *Package) Uninstall() error {
-	return p.manager.Uninstall(p)
+	return p.manager.UninstallByName(p.Name())
 }
 
 func (p *Package) Reinstall() error {

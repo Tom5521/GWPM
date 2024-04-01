@@ -11,16 +11,9 @@ import (
 // TODO: Remove this to release... or not...
 func (c *Command) Make() *exec.Cmd {
 	cmd := exec.Command(c.Bin, c.Args...)
-	if !c.Hide {
-		if c.Stdout {
-			cmd.Stdout = os.Stdout
-		}
-		if c.Stderr {
-			cmd.Stderr = os.Stderr
-		}
-		if c.Stdin {
-			cmd.Stdin = os.Stdin
-		}
-	}
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+
 	return cmd
 }
