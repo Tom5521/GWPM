@@ -31,8 +31,12 @@ func (s *Search) toggleLoading() {
 	s.Charge.Button.Hide()
 }
 
-func (s *Search) Init() *Search {
+func (s *Search) Init() {
 	s.Entry = widget.NewEntry()
+	s.Entry.OnChanged = func(str string) {
+		cui.settings.SetString("search-entry", str)
+	}
+	s.Entry.SetText(cui.settings.String("search-entry"))
 
 	s.Charge.LoadBar = widget.NewProgressBarInfinite()
 	s.Charge.LoadBar.Start()
@@ -86,7 +90,6 @@ func (s *Search) Init() *Search {
 		s.toggleLoading()
 	})
 	s.Box = boxes.NewBorder(nil, nil, s.ModeSelect, s.Charge.Box, s.Entry)
-	return s
 }
 
 func (s *Search) InitSelect() {

@@ -30,7 +30,7 @@ type SideBar struct {
 	LoadBar *widget.ProgressBar
 }
 
-func (s *SideBar) Init() *SideBar {
+func (s *SideBar) Init() {
 	newFormItem := func(title any, text ...any) *widget.FormItem {
 		return widget.NewFormItem(fmt.Sprint(title), widget.NewLabel(fmt.Sprint(text...)))
 	}
@@ -68,8 +68,6 @@ func (s *SideBar) Init() *SideBar {
 		),
 	)
 	s.Box.Hide()
-
-	return s
 }
 
 func (s *SideBar) Load(p pkg.Packager) {
