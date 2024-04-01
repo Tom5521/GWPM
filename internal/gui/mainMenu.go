@@ -43,10 +43,10 @@ func (m *MainMenu) Init() {
 							return
 						}
 						cui.settings.SetString("manager", selected)
-						cui.search.toggleLoading()
-						cui.InitManager()
-						cui.InitPkgSlice()
-						cui.search.toggleLoading()
+						FuncLoadingDialog(
+							cui.InitManager,
+							cui.InitPkgSlice,
+						)
 					},
 					cui.mainWindow,
 				)
@@ -75,22 +75,22 @@ func (m *MainMenu) Init() {
 				}
 			}),
 			fyne.NewMenuItem("Install selected", func() {
-				cui.search.toggleLoading()
+				LoadingDialog.Show()
 				pkgs := checkedPkgs()
 				err := cui.manager.InstallByName(pkgs...)
 				if err != nil {
 					popups.Error(err)
 				}
-				cui.search.toggleLoading()
+				LoadingDialog.Hide()
 			}),
 			fyne.NewMenuItem("Uninstall selected", func() {
-				cui.search.toggleLoading()
+				LoadingDialog.Show()
 				pkgs := checkedPkgs()
 				err := cui.manager.UninstallByName(pkgs...)
 				if err != nil {
 					popups.Error(err)
 				}
-				cui.search.toggleLoading()
+				LoadingDialog.Hide()
 			}),
 		),
 	)

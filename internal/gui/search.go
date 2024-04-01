@@ -14,21 +14,7 @@ type Search struct {
 	ModeSelect *widget.Select
 
 	Entry  *widget.Entry
-	Charge struct {
-		Box     *fyne.Container
-		Button  *widget.Button
-		LoadBar *widget.ProgressBarInfinite
-	}
-}
-
-func (s *Search) toggleLoading() {
-	if s.Charge.Button.Hidden {
-		s.Charge.Button.Show()
-		s.Charge.LoadBar.Hide()
-		return
-	}
-	s.Charge.LoadBar.Show()
-	s.Charge.Button.Hide()
+	Button *widget.Button
 }
 
 func (s *Search) Init() {
@@ -38,13 +24,8 @@ func (s *Search) Init() {
 	}
 	s.Entry.SetText(cui.settings.String("search-entry"))
 
-	s.Charge.LoadBar = widget.NewProgressBarInfinite()
-	s.Charge.LoadBar.Start()
-	s.Charge.LoadBar.Hide()
-
-	s.Charge.Button = widget.NewButton("Search", func() {
-		s.toggleLoading()
-
+	s.Button = widget.NewButton("Search", func() {
+		LoadingDialog.Show()
 		var (
 			err   error
 			cpkgs []pkg.Packager
@@ -73,10 +54,10 @@ func (s *Search) Init() {
 			cui.packages = append(cui.packages, packager{Packager: p})
 		}
 
-		s.toggleLoading()
-	})
+		cui.list.Refresh()
 
-	s.Charge.Box = boxes.NewStack(s.Charge.Button, s.Charge.LoadBar)
+		LoadingDialog.Hide()
+	})
 
 	s.ModeSelect = widget.NewSelect([]string{"Local", "Repository"}, func(str string) {
 		switch str {
@@ -85,11 +66,9 @@ func (s *Search) Init() {
 		case "Repository":
 			cui.settings.SetString("list-mode", "repo")
 		}
-		s.toggleLoading()
-		cui.InitPkgSlice()
-		s.toggleLoading()
+		FuncLoadingDialog(cui.InitPkgSlice)
 	})
-	s.Box = boxes.NewBorder(nil, nil, s.ModeSelect, s.Charge.Box, s.Entry)
+	s.Box = boxes.NewBorder(nil, nil, s.ModeSelect, s.Button, s.Entry)
 }
 
 func (s *Search) InitSelect() {

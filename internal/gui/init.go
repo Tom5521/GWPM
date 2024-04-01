@@ -52,6 +52,7 @@ func InitGUI() {
 	cui.mainWindow.Resize(fyne.NewSize(830, 390))
 
 	// Initialize methods.
+	InitLoadingDialog()
 	cui.InitManager()
 	cui.sideBar.Init()
 	cui.search.Init()
@@ -104,6 +105,7 @@ func (ui *ui) InitPkgSlice() {
 			Packager: p,
 		})
 	}
+	ui.list.Refresh()
 }
 
 func (ui *ui) InitList() {
