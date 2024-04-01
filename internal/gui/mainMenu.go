@@ -2,7 +2,11 @@ package gui
 
 import (
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
+	"github.com/Tom5521/GWPM/pkg/choco"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
+	"github.com/Tom5521/GWPM/pkg/scoop"
 )
 
 type MainMenu struct {
@@ -11,15 +15,44 @@ type MainMenu struct {
 
 func (m *MainMenu) Init() {
 	m.Menu = fyne.NewMainMenu(
-		/*
-			fyne.NewMenu("Manager",
-				fyne.NewMenuItem("Reload", func() {
-					cui.InitPkgSlice()
-				}),
-				fyne.NewMenuItem("Change", func() {
-
-				}),
-			),*/
+		fyne.NewMenu("Manager",
+			fyne.NewMenuItem("Reload", func() {
+				cui.InitPkgSlice()
+			}),
+			fyne.NewMenuItem("Change", func() {
+				options := []string{choco.ManagerName, scoop.ManagerName}
+				var selected string
+				d := dialog.NewForm(
+					"Select manager",
+					"Select",
+					"Cancel",
+					[]*widget.FormItem{
+						widget.NewFormItem("Manager:", widget.NewSelect(options, func(s string) {
+							selected = s
+						})),
+					},
+					func(b bool) {
+						if !b {
+							return
+						}
+						if selected == "" {
+							popups.Error("No option selected.")
+							return
+						}
+						if selected == cui.manager.Name() {
+							return
+						}
+						cui.settings.SetString("manager", selected)
+						cui.search.toggleLoading()
+						cui.InitManager()
+						cui.InitPkgSlice()
+						cui.search.toggleLoading()
+					},
+					cui.mainWindow,
+				)
+				d.Show()
+			}),
+		),
 		fyne.NewMenu("Packages",
 			fyne.NewMenuItem("Select All", func() {
 				for i := range cui.list.Length() {

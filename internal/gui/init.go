@@ -86,6 +86,10 @@ func (ui *ui) InitPkgSlice() {
 	case "local":
 		packagers, err = ui.manager.LocalPkgs()
 	case "repo":
+		if ui.search.Entry.Text == "" {
+			packagers = []pkg.Packager{}
+			return
+		}
 		packagers, err = ui.manager.SearchInRepo(ui.search.Entry.Text)
 	default:
 		ui.settings.SetString("list-mode", "local")
