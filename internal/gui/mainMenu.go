@@ -42,7 +42,7 @@ func (m *MainMenu) Init() {
 						if selected == cui.manager.Name() {
 							return
 						}
-						cui.settings.SetString("manager", selected)
+						cui.settings.SetString(ManagerID, selected)
 						FuncLoadingDialog(
 							cui.InitManager,
 							cui.InitPkgSlice,

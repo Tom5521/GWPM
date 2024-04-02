@@ -12,6 +12,12 @@ import (
 	boxes "fyne.io/fyne/v2/container"
 )
 
+const (
+	ManagerID     = "manager"
+	ListModeID    = "list-mode"
+	SearchEntryID = "search-entry"
+)
+
 type packager struct {
 	pkg.Packager
 	Checked bool
@@ -67,13 +73,13 @@ func InitGUI() {
 }
 
 func (ui *ui) InitManager() {
-	switch ui.settings.String("manager") {
+	switch ui.settings.String(ManagerID) {
 	case choco.ManagerName:
 		ui.manager = choco.Connect()
 	case scoop.ManagerName:
 		ui.manager = scoop.Connect()
 	default:
-		ui.settings.SetString("manager", choco.ManagerName)
+		ui.settings.SetString(ManagerID, choco.ManagerName)
 		ui.manager = choco.Connect()
 	}
 }
@@ -83,7 +89,7 @@ func (ui *ui) InitPkgSlice() {
 		packagers []pkg.Packager
 		err       error
 	)
-	switch ui.settings.String("list-mode") {
+	switch ui.settings.String(ListModeID) {
 	case "local":
 		packagers, err = ui.manager.LocalPkgs()
 	case "repo":
@@ -93,7 +99,7 @@ func (ui *ui) InitPkgSlice() {
 		}
 		packagers, err = ui.manager.SearchInRepo(ui.search.Entry.Text)
 	default:
-		ui.settings.SetString("list-mode", "local")
+		ui.settings.SetString(ListModeID, "local")
 		packagers, err = ui.manager.LocalPkgs()
 	}
 	if err != nil {
@@ -105,7 +111,7 @@ func (ui *ui) InitPkgSlice() {
 			Packager: p,
 		})
 	}
-	if ui.list != nil{
+	if ui.list != nil {
 		ui.list.Refresh()
 	}
 }

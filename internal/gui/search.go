@@ -20,9 +20,9 @@ type Search struct {
 func (s *Search) Init() {
 	s.Entry = widget.NewEntry()
 	s.Entry.OnChanged = func(str string) {
-		cui.settings.SetString("search-entry", str)
+		cui.settings.SetString(SearchEntryID, str)
 	}
-	s.Entry.SetText(cui.settings.String("search-entry"))
+	s.Entry.SetText(cui.settings.String(SearchEntryID))
 
 	s.Button = widget.NewButton("Search", func() {
 		LoadingDialog.Show()
@@ -31,7 +31,7 @@ func (s *Search) Init() {
 			cpkgs []pkg.Packager
 		)
 
-		if cui.settings.String("list-mode") == "local" {
+		if cui.settings.String(ListModeID) == "local" {
 			if s.Entry.Text == "" {
 				cpkgs, err = cui.manager.LocalPkgs()
 			} else {
@@ -60,9 +60,9 @@ func (s *Search) Init() {
 	s.ModeSelect = widget.NewSelect([]string{"Local", "Repository"}, func(str string) {
 		switch str {
 		case "Local":
-			cui.settings.SetString("list-mode", "local")
+			cui.settings.SetString(ListModeID, "local")
 		case "Repository":
-			cui.settings.SetString("list-mode", "repo")
+			cui.settings.SetString(ListModeID, "repo")
 		}
 		FuncLoadingDialog(cui.InitPkgSlice)
 	})
@@ -71,7 +71,7 @@ func (s *Search) Init() {
 
 func (s *Search) InitSelect() {
 	s.ModeSelect.SetSelectedIndex(func() int {
-		switch cui.settings.String("list-mode") {
+		switch cui.settings.String(ListModeID) {
 		case "local":
 			return 0
 		case "repo":
