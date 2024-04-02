@@ -28,10 +28,9 @@ func FuncLoadingDialog(funcs ...func()) {
 		cui.mainWindow,
 	)
 	d.Show()
-	v := float64(len(funcs))
 	run := func(f func()) {
 		f()
-		bar.SetValue(bar.Value + (1.0 / v))
+		bar.SetValue(bar.Value + (1.0 / float64(len(funcs))))
 	}
 	for _, f := range funcs {
 		run(f)
