@@ -105,7 +105,9 @@ func (ui *ui) InitPkgSlice() {
 			Packager: p,
 		})
 	}
-	ui.list.Refresh()
+	if ui.list != nil{
+		ui.list.Refresh()
+	}
 }
 
 func (ui *ui) InitList() {

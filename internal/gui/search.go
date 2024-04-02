@@ -48,14 +48,12 @@ func (s *Search) Init() {
 		if err != nil {
 			popups.Error(err)
 		}
-
 		cui.packages = []packager{}
 		for _, p := range cpkgs {
 			cui.packages = append(cui.packages, packager{Packager: p})
 		}
 
 		cui.list.Refresh()
-
 		LoadingDialog.Hide()
 	})
 
