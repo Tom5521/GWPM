@@ -2,6 +2,8 @@ package choco
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/Tom5521/GWPM/pkg"
@@ -236,4 +238,17 @@ func (m *Manager) IsInLocal(p pkg.Packager) bool {
 		}
 	}
 	return false
+}
+
+func (m *Manager) InstallManager() error {
+	if m.isInstalled {
+		return pkg.ErrManagerIsInstalled
+	}
+	const command = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+	cmd := exec.Command("powershell", "-c", command)
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+
+	return cmd.Run()
 }

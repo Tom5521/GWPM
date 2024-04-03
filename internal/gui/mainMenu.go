@@ -4,9 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"github.com/Tom5521/GWPM/pkg/choco"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
-	"github.com/Tom5521/GWPM/pkg/scoop"
 )
 
 type MainMenu struct {
@@ -20,14 +18,13 @@ func (m *MainMenu) Init() {
 				cui.InitPkgSlice()
 			}),
 			fyne.NewMenuItem("Change", func() {
-				options := []string{choco.ManagerName, scoop.ManagerName}
 				var selected string
 				d := dialog.NewForm(
 					"Select manager",
 					"Select",
 					"Cancel",
 					[]*widget.FormItem{
-						widget.NewFormItem("Manager:", widget.NewSelect(options, func(s string) {
+						widget.NewFormItem("Manager:", widget.NewSelect(Managers, func(s string) {
 							selected = s
 						})),
 					},

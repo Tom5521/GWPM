@@ -10,6 +10,7 @@ var (
 	ErrPkgNotInstalled     = errors.New("the package isn't installed")
 	ErrNotAdministrator    = errors.New("not running as adminstrator")
 	ErrPkgNotFound         = errors.New("package not found")
+	ErrManagerIsInstalled  = errors.New("the package manager is not installed")
 )
 
 // TODO:Comment and document this.
@@ -43,4 +44,5 @@ type Managerer interface {
 	SearchInLocal(string) ([]Packager, error)
 	IsInRepo(Packager) bool
 	IsInLocal(Packager) bool
+	InstallManager() error
 }
