@@ -111,13 +111,6 @@ func (ui *ui) InitManager() {
 		)
 		if err != nil {
 			os.Exit(1)
-			/*
-				nindex := index(ui.manager.Name()) + 1
-				if nindex > len(Managers)-1 {
-					nindex = 0
-				}
-				ui.settings.SetString(ManagerID, Managers[nindex])
-				ui.InitManager()*/
 			return
 		}
 		selected, err := zenity.List(
