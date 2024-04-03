@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"os"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
@@ -8,9 +10,15 @@ import (
 	"github.com/Tom5521/GWPM/pkg/choco"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
 	"github.com/Tom5521/GWPM/pkg/scoop"
+	"github.com/ncruces/zenity"
 
 	boxes "fyne.io/fyne/v2/container"
 )
+
+var Managers = []string{
+	choco.ManagerName,
+	scoop.ManagerName,
+}
 
 const (
 	ManagerID     = "manager"
@@ -73,14 +81,60 @@ func InitGUI() {
 }
 
 func (ui *ui) InitManager() {
-	switch ui.settings.String(ManagerID) {
-	case choco.ManagerName:
-		ui.manager = choco.Connect()
-	case scoop.ManagerName:
-		ui.manager = scoop.Connect()
-	default:
-		ui.settings.SetString(ManagerID, choco.ManagerName)
-		ui.manager = choco.Connect()
+	/*
+		index := func(c string) int {
+			return slices.IndexFunc(Managers, func(s string) bool {
+				return s == c
+			})
+		}
+	*/
+	manager := func(name string) pkg.Managerer {
+		var manager pkg.Managerer
+		switch name {
+		case choco.ManagerName:
+			manager = choco.Connect()
+		case scoop.ManagerName:
+			manager = scoop.Connect()
+		default:
+			ui.settings.SetString(ManagerID, choco.ManagerName)
+			manager = choco.Connect()
+		}
+		return manager
+	}
+	ui.manager = manager(ui.settings.String(ManagerID))
+	if !ui.manager.IsInstalled() {
+		err := zenity.Question(
+			"The current package manager is not installed",
+			zenity.Title("Install a package manager?"),
+			zenity.OKLabel("Install package managers."),
+			zenity.CancelLabel("Exit"),
+		)
+		if err != nil {
+			os.Exit(1)
+			/*
+				nindex := index(ui.manager.Name()) + 1
+				if nindex > len(Managers)-1 {
+					nindex = 0
+				}
+				ui.settings.SetString(ManagerID, Managers[nindex])
+				ui.InitManager()*/
+			return
+		}
+		selected, err := zenity.List(
+			"Select a package manager to install",
+			Managers,
+			zenity.OKLabel("Install"),
+		)
+		if err != nil {
+			os.Exit(0)
+		}
+		newManager := manager(selected)
+		err = newManager.InstallManager()
+		if err != nil {
+			popups.FatalError(err)
+		}
+		ui.settings.SetString(ManagerID, newManager.Name())
+		ui.manager = newManager
 	}
 }
 
