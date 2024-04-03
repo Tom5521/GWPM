@@ -81,13 +81,6 @@ func InitGUI() {
 }
 
 func (ui *ui) InitManager() {
-	/*
-		index := func(c string) int {
-			return slices.IndexFunc(Managers, func(s string) bool {
-				return s == c
-			})
-		}
-	*/
 	manager := func(name string) pkg.Managerer {
 		var manager pkg.Managerer
 		switch name {
