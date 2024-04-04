@@ -119,11 +119,9 @@ func (m *Manager) RepoPkgByName(p string) (pkg.Packager, error) {
 	if err != nil {
 		return rpkg, err
 	}
-
 	if len(rpkgs) == 0 {
 		return rpkg, pkg.ErrPkgNotFound
 	}
-
 	for _, rp := range rpkgs {
 		if rpkg.Name() == rp.Name() {
 			return rp, nil
