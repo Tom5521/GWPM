@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
+	"os/user"
 	"strings"
 
 	"github.com/Tom5521/GWPM/pkg"
@@ -66,69 +66,49 @@ func (m *Manager) Version() string {
 	return m.version
 }
 
-/*
-Export JSON Template
-{
-    "buckets": [
-        {
-            "Name": "main",
-            "Source": "~\\scoop\\buckets\\main",
-            "Updated": "\/Date(1711372226285)\/",
-            "Manifests": 1310
-        }
-    ],
-    "apps": [
-        {
-            "Info": "",
-            "Source": "main",
-            "Name": "psutils",
-            "Version": "0.2023.06.28",
-            "Updated": "\/Date(1711372676457)\/"
-        }
-    ]
-}
-*/
-
 func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 	var pkgs []pkg.Packager
 
-	var packages struct {
-		Buckets []struct {
-			Name      string `json:"Name"`
-			Source    string `json:"Source"`
-			Updated   string `json:"Updated"`
-			Manifests int    `json:"Manifests"`
-		} `json:"buckets"`
-		Apps []struct {
-			Info    string `json:"Info"`
-			Source  string `json:"Source"`
-			Name    string `json:"Name"`
-			Version string `json:"Version"`
-			Updated string `json:"Updated"`
-		} `json:"apps"`
-	}
-
-	cmd := term.NewCommand("scoop", "export")
-	cmd.Hide = true
-	out, err := cmd.Output()
+	usr, err := user.Current()
 	if err != nil {
 		return pkgs, err
 	}
-	err = json.Unmarshal([]byte(out), &packages)
+	root := usr.HomeDir + "\\scoop\\apps\\"
+	dirs, err := os.ReadDir(root)
 	if err != nil {
 		return pkgs, err
 	}
-
-	for _, p := range packages.Apps {
-		pkgs = append(pkgs, &Package{
-			name:    p.Name,
-			version: p.Version,
-			bucket:  p.Source,
+	for _, d := range dirs {
+		if !d.IsDir() {
+			continue
+		}
+		if d.Name() == "scoop" {
+			continue
+		}
+		file, err := os.ReadFile(root + d.Name() + "\\current\\manifest.json")
+		if err != nil {
+			return pkgs, err
+		}
+		var data map[string]any
+		err = json.Unmarshal(file, &data)
+		if err != nil {
+			return pkgs, err
+		}
+		var version string
+		for i, f := range data {
+			if i == "version" {
+				version = fmt.Sprint(f)
+				break
+			}
+		}
+		p := &Package{
+			name:    d.Name(),
+			version: version,
 			manager: m,
 			local:   true,
-		})
+		}
+		pkgs = append(pkgs, p)
 	}
-
 	return pkgs, nil
 }
 
@@ -216,7 +196,6 @@ func (m *Manager) SearchInRepo(p string) ([]pkg.Packager, error) {
 		}
 		pkgs = append(pkgs, &Package{
 			name:    parts[0],
-			bucket:  parts[1],
 			version: "unknown",
 			repo:    true,
 			manager: m,
@@ -260,16 +239,11 @@ func (m *Manager) InstallManager() error {
 		command1 = "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser"
 		command2 = "Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression"
 	)
-	cmd := exec.Command("powershell", "-c", command1)
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-
+	cmd := term.NewCommand("powershell", "-c", command1)
 	err := cmd.Run()
 	if err != nil {
 		return err
 	}
-	cmd.Args = cmd.Args[0:]
-	cmd.Args = append(cmd.Args, command2)
+	cmd = term.NewCommand("powershell", "-c", command2)
 	return cmd.Run()
 }

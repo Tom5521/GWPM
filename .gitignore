@@ -3,3 +3,6 @@ vendor
 *_skip.*
 *.test*
 builds
+*.dll
+# Fuck windows, and fuck nvidia
+System Volume Information

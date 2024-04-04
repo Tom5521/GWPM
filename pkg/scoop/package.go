@@ -8,8 +8,6 @@ type Package struct {
 	name    string
 	version string
 
-	bucket string
-
 	local, repo bool
 
 	manager *Manager
@@ -59,8 +57,4 @@ func (p *Package) Local() bool {
 
 func (p *Package) Repo() bool {
 	return p.repo
-}
-
-func (p *Package) Bucket() string {
-	return p.bucket
 }
