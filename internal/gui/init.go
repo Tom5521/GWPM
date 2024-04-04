@@ -97,9 +97,9 @@ func (ui *ui) InitManager() {
 	ui.manager = manager(ui.settings.String(ManagerID))
 	if !ui.manager.IsInstalled() {
 		err := zenity.Question(
-			"The current package manager is not installed",
+			"The current package manager is not installed,Do you want to install a package manager?",
 			zenity.Title("Install a package manager?"),
-			zenity.OKLabel("Install package managers."),
+			zenity.OKLabel("Install"),
 			zenity.CancelLabel("Exit"),
 		)
 		if err != nil {
