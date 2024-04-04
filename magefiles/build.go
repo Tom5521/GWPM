@@ -9,6 +9,8 @@ import (
 
 type Build mg.Namespace
 
+var build Build
+
 var env = func() map[string]string {
 	var env map[string]string
 	if runtime.GOOS != "windows" {
@@ -21,7 +23,7 @@ var env = func() map[string]string {
 	return env
 }()
 
-func (Build) Release() error {
+func (Build) App() error {
 	err := sh.RunWithV(env, "go", "build", "-v", "-o=builds/gwpm.exe", ".")
 	return err
 }
