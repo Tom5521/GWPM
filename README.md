@@ -20,8 +20,8 @@ managers that the program supports.
 
 For now these are the supported package managers and their installation guides
 
-- [Chocolatey](https://chocolatey.org/install)
-- [Scoop](https://scoop.sh)
+- [Chocolatey](https://chocolatey.org/install)🍫
+- [Scoop](https://scoop.sh)🍨
 
 **You can also install them through the program itself, you simply have to
 select in the configuration a package manager not installed,
