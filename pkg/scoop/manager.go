@@ -88,6 +88,10 @@ func (m *Manager) LocalPkgs() ([]pkg.Packager, error) {
 		}
 		file, err := os.ReadFile(root + d.Name() + "\\current\\manifest.json")
 		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				msg.Warningf("Skipping %s...", d.Name())
+				continue
+			}
 			return pkgs, err
 		}
 		var data map[string]any
