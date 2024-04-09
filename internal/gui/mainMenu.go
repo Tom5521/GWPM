@@ -13,41 +13,9 @@ type MainMenu struct {
 
 func (m *MainMenu) Init() {
 	m.Menu = fyne.NewMainMenu(
-		fyne.NewMenu("Manager",
+		fyne.NewMenu("File",
 			fyne.NewMenuItem("Reload", func() {
-				cui.InitPkgSlice()
-			}),
-			fyne.NewMenuItem("Change", func() {
-				var selected string
-				d := dialog.NewForm(
-					"Select manager",
-					"Select",
-					"Cancel",
-					[]*widget.FormItem{
-						widget.NewFormItem("Manager:", widget.NewSelect(Managers, func(s string) {
-							selected = s
-						})),
-					},
-					func(b bool) {
-						if !b {
-							return
-						}
-						if selected == "" {
-							popups.Error("No option selected.")
-							return
-						}
-						if selected == cui.manager.Name() {
-							return
-						}
-						cui.settings.SetString(ManagerID, selected)
-						FuncLoadingDialog(
-							cui.InitManager,
-							cui.InitPkgSlice,
-						)
-					},
-					cui.mainWindow,
-				)
-				d.Show()
+				InfiniteLoadingDialog(cui.InitPkgSlice)
 			}),
 		),
 		fyne.NewMenu("Packages",
@@ -88,6 +56,43 @@ func (m *MainMenu) Init() {
 					popups.Error(err)
 				}
 				LoadingDialog.Hide()
+			}),
+		),
+		fyne.NewMenu("Options",
+			fyne.NewMenuItem("Open settings window", func() {
+				ShowSettingsWindow()
+			}),
+			fyne.NewMenuItem("Change package manager", func() {
+				var selected string
+				d := dialog.NewForm(
+					"Select manager",
+					"Select",
+					"Cancel",
+					[]*widget.FormItem{
+						widget.NewFormItem("Manager:", widget.NewSelect(Managers, func(s string) {
+							selected = s
+						})),
+					},
+					func(b bool) {
+						if !b {
+							return
+						}
+						if selected == "" {
+							popups.Error("No option selected.")
+							return
+						}
+						if selected == cui.manager.Name() {
+							return
+						}
+						cui.settings.SetString(ManagerID, selected)
+						FuncLoadingDialog(
+							cui.InitManager,
+							cui.InitPkgSlice,
+						)
+					},
+					cui.mainWindow,
+				)
+				d.Show()
 			}),
 		),
 	)
