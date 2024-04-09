@@ -66,7 +66,7 @@ func InitGUI() {
 	cui.mainWindow.Resize(fyne.NewSize(830, 390))
 
 	// Initialize methods.
-	InitLoadingDialog()
+	InitDialogs()
 	cui.InitManager()
 	cui.sideBar.Init()
 	cui.search.Init()
@@ -181,5 +181,9 @@ func (ui *ui) InitList() {
 }
 
 func (ui *ui) InitBoxes() {
-	ui.mainBox = boxes.NewBorder(ui.search.Box, nil, nil, ui.sideBar.Box, ui.list)
+	installBtn := widget.NewButton("Install", InstallSelected)
+	uninstallBtn := widget.NewButton("Uninstall", UninstallSelected)
+	buttonsBox := boxes.NewAdaptiveGrid(2, installBtn, uninstallBtn)
+
+	ui.mainBox = boxes.NewBorder(ui.search.Box, buttonsBox, nil, ui.sideBar.Box, ui.list)
 }

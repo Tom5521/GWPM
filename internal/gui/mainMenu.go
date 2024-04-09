@@ -39,26 +39,8 @@ func (m *MainMenu) Init() {
 					cui.list.RefreshItem(i)
 				}
 			}),
-			fyne.NewMenuItem("Install selected", func() {
-				LoadingDialog.Show()
-				pkgs := checkedPkgs()
-				err := cui.manager.InstallByName(pkgs...)
-				if err != nil {
-					popups.Error(err)
-				}
-				cui.InitPkgSlice()
-				LoadingDialog.Hide()
-			}),
-			fyne.NewMenuItem("Uninstall selected", func() {
-				LoadingDialog.Show()
-				pkgs := checkedPkgs()
-				err := cui.manager.UninstallByName(pkgs...)
-				if err != nil {
-					popups.Error(err)
-				}
-				cui.InitPkgSlice()
-				LoadingDialog.Hide()
-			}),
+			fyne.NewMenuItem("Install selected", InstallSelected),
+			fyne.NewMenuItem("Uninstall selected", UninstallSelected),
 		),
 		fyne.NewMenu("Options",
 			fyne.NewMenuItem("Open settings window", func() {
@@ -98,6 +80,28 @@ func (m *MainMenu) Init() {
 			}),
 		),
 	)
+}
+
+func UninstallSelected() {
+	UninstallingDialog.Show()
+	pkgs := checkedPkgs()
+	err := cui.manager.UninstallByName(pkgs...)
+	if err != nil {
+		popups.Error(err)
+	}
+	cui.InitPkgSlice()
+	UninstallingDialog.Hide()
+}
+
+func InstallSelected() {
+	InstallingDialog.Show()
+	pkgs := checkedPkgs()
+	err := cui.manager.InstallByName(pkgs...)
+	if err != nil {
+		popups.Error(err)
+	}
+	cui.InitPkgSlice()
+	InstallingDialog.Hide()
 }
 
 func checkedPkgs() []string {

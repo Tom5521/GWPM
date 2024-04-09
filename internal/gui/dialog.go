@@ -40,14 +40,24 @@ func FuncLoadingDialog(funcs ...func()) {
 	d.Hide()
 }
 
-var LoadingDialog *dialog.CustomDialog
+var (
+	LoadingDialog      *dialog.CustomDialog
+	InstallingDialog   *dialog.CustomDialog
+	UninstallingDialog *dialog.CustomDialog
+)
 
-func InitLoadingDialog() {
+func makeRawProgressDialog(text string) *dialog.CustomDialog {
 	bar := widget.NewProgressBarInfinite()
 	bar.Start()
-	LoadingDialog = dialog.NewCustomWithoutButtons(
-		"Loading...",
+	return dialog.NewCustomWithoutButtons(
+		text,
 		bar,
 		cui.mainWindow,
 	)
+}
+
+func InitDialogs() {
+	LoadingDialog = makeRawProgressDialog("Loading...")
+	InstallingDialog = makeRawProgressDialog("Installing...")
+	UninstallingDialog = makeRawProgressDialog("Uninstalling...")
 }

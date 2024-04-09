@@ -41,7 +41,7 @@ having a life thing.
 
 ## Acknowledgements
 
-- [Awesome README](https://github.com/matiassingers/awesome-readme)
+- [README.so](https://readme.so/)
 
 ## License
 
