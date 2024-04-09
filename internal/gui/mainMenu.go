@@ -46,6 +46,7 @@ func (m *MainMenu) Init() {
 				if err != nil {
 					popups.Error(err)
 				}
+				cui.InitPkgSlice()
 				LoadingDialog.Hide()
 			}),
 			fyne.NewMenuItem("Uninstall selected", func() {
@@ -55,6 +56,7 @@ func (m *MainMenu) Init() {
 				if err != nil {
 					popups.Error(err)
 				}
+				cui.InitPkgSlice()
 				LoadingDialog.Hide()
 			}),
 		),
