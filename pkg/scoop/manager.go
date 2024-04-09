@@ -10,6 +10,7 @@ import (
 
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/term"
+	msg "github.com/Tom5521/GoNotes/pkg/messages"
 	"github.com/sahilm/fuzzy"
 )
 
@@ -179,8 +180,12 @@ func (m *Manager) SearchInRepo(p string) ([]pkg.Packager, error) {
 	}
 
 	if strings.Contains(out, "GitHub API rate limit reached.") {
-		fmt.Println("Please try again later or configure your API token using 'scoop config gh_token <your token>'.")
+		msg.Warning("Please try again later or configure your API token using 'scoop config gh_token <your token>'.")
 		return pkgs, errors.New("github API rate limit reached")
+	}
+	if strings.Contains(out, "WARN  No matches found.") {
+		msg.Warning("No matches found.")
+		return pkgs, nil
 	}
 
 	lines := strings.Split(out, "\n")[4:] // [4:] to skip header
