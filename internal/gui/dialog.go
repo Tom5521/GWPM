@@ -5,7 +5,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func InfiniteLoadingDialog(f func()) {
+func InfiniteLoadingDialog(functions ...func()) {
 	bar := widget.NewProgressBarInfinite()
 	bar.Start()
 	d := dialog.NewCustomWithoutButtons(
@@ -14,7 +14,9 @@ func InfiniteLoadingDialog(f func()) {
 		cui.mainWindow,
 	)
 	d.Show()
-	f()
+	for _, f := range functions {
+		f()
+	}
 	d.Hide()
 }
 
