@@ -13,13 +13,13 @@ type MainMenu struct {
 
 func (m *MainMenu) Init() {
 	m.Menu = fyne.NewMainMenu(
-		fyne.NewMenu("File",
-			fyne.NewMenuItem("Reload", func() {
+		fyne.NewMenu(po.Get("File"),
+			fyne.NewMenuItem(po.Get("Reload"), func() {
 				InfiniteLoadingDialog(cui.InitPkgSlice)
 			}),
 		),
-		fyne.NewMenu("Packages",
-			fyne.NewMenuItem("Select All", func() {
+		fyne.NewMenu(po.Get("Packages"),
+			fyne.NewMenuItem(po.Get("Select all"), func() {
 				for i := range cui.list.Length() {
 					p := cui.packages[i]
 					if p.Checked {
@@ -29,7 +29,7 @@ func (m *MainMenu) Init() {
 					cui.list.RefreshItem(i)
 				}
 			}),
-			fyne.NewMenuItem("Unselect all", func() {
+			fyne.NewMenuItem(po.Get("Unselect all"), func() {
 				for i := range cui.list.Length() {
 					p := cui.packages[i]
 					if !p.Checked {
@@ -39,21 +39,21 @@ func (m *MainMenu) Init() {
 					cui.list.RefreshItem(i)
 				}
 			}),
-			fyne.NewMenuItem("Install selected", InstallSelected),
-			fyne.NewMenuItem("Uninstall selected", UninstallSelected),
+			fyne.NewMenuItem(po.Get("Install selected packages"), InstallSelected),
+			fyne.NewMenuItem(po.Get("Uninstall selected packages"), UninstallSelected),
 		),
-		fyne.NewMenu("Options",
-			fyne.NewMenuItem("Open settings window", func() {
+		fyne.NewMenu(po.Get("Options"),
+			fyne.NewMenuItem(po.Get("Settings"), func() {
 				ShowSettingsWindow()
 			}),
-			fyne.NewMenuItem("Change package manager", func() {
+			fyne.NewMenuItem(po.Get("Change package manager"), func() {
 				var selected string
 				d := dialog.NewForm(
-					"Select manager",
-					"Select",
-					"Cancel",
+					po.Get("Select manager"),
+					po.Get("Select"),
+					po.Get("Cancel"),
 					[]*widget.FormItem{
-						widget.NewFormItem("Manager:", widget.NewSelect(Managers, func(s string) {
+						widget.NewFormItem(po.Get("Manager:"), widget.NewSelect(Managers, func(s string) {
 							selected = s
 						})),
 					},
@@ -62,7 +62,7 @@ func (m *MainMenu) Init() {
 							return
 						}
 						if selected == "" {
-							popups.Error("No option selected.")
+							popups.Error(po.Get("No option selected."))
 							return
 						}
 						if selected == cui.manager.Name() {
