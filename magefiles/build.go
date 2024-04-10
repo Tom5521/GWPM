@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"runtime"
+	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -26,6 +28,23 @@ var env = func() map[string]string {
 func (Build) App() error {
 	err := sh.RunWithV(env, "go", "build", "-v", "-o=builds/gwpm.exe", ".")
 	return err
+}
+
+func (Build) WithLdflags(input string) error {
+	ldflags := strings.Fields(input)
+	var args []string
+	args = append(args, "build", "-v", "-o=builds/gwpm.exe")
+
+	if len(ldflags) > 0 {
+		arg := `-ldflags=%s`
+		var flags string
+		for _, flag := range ldflags {
+			flags += fmt.Sprintf(`-X 'github.com/Tom5521/GWPM/%s' `, flag)
+		}
+		args = append(args, fmt.Sprintf(arg, flags))
+	}
+	args = append(args, ".")
+	return sh.RunWithV(env, "go", args...)
 }
 
 func (Build) Tests() error {
