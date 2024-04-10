@@ -1,10 +1,13 @@
 package gui
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	boxes "fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GWPM/internal/gui/credits"
+	"github.com/Tom5521/GWPM/internal/meta"
 	"github.com/Tom5521/GWPM/locales"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
 	"github.com/ncruces/zenity"
@@ -64,10 +67,27 @@ func ShowSettingsWindow() {
 		zenity.Info(po.Get("Restart the application to see it in your language."))
 	}
 
+	// Meta info
+
+	buildNumber := widget.NewLabel(fmt.Sprintf("Build:%v", meta.BuildNumber))
+	releaseVersion := widget.NewLabel(fmt.Sprintf("Release:%v", meta.Release))
+	devBuild := widget.NewLabel(fmt.Sprintf("Development build:%v", meta.DevBuild))
+
+	metaBox := boxes.NewVBox(
+		buildNumber,
+		releaseVersion,
+		devBuild,
+	)
+	if meta.Release {
+		metaBox.Hide()
+	}
+
 	content := boxes.NewVBox(
 		boxes.NewHBox(pkgManagerLabel, pkgManagerSelect),
 		boxes.NewHBox(langLabel, langSelect),
 		creditsBtn,
+
+		metaBox,
 	)
 
 	w.SetContent(content)

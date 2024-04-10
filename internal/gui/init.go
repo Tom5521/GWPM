@@ -1,11 +1,13 @@
 package gui
 
 import (
+	"fmt"
 	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Tom5521/GWPM/internal/meta"
 	"github.com/Tom5521/GWPM/locales"
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/choco"
@@ -68,7 +70,13 @@ func InitGUI() {
 		mainMenu: new(MainMenu),
 	}
 	InitLocales()
-	cui.mainWindow = app.NewWindow(po.Get("Graphic Windows Package Manager"))
+	winName := po.Get("Graphic Windows Package Manager") + func() string {
+		if meta.DevBuild {
+			return fmt.Sprintf(" build:%v", meta.BuildNumber)
+		}
+		return ""
+	}()
+	cui.mainWindow = app.NewWindow(winName)
 	cui.mainWindow.SetMaster()
 	cui.mainWindow.Resize(fyne.NewSize(830, 390))
 

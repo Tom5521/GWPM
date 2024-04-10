@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -86,6 +87,47 @@ func makeZip() error {
 	}
 	fmt.Println("Cleaning...")
 	err = os.RemoveAll(zipDir)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type Metadata struct {
+	BuildNumber int `json:"build number"`
+}
+
+func (m *Metadata) Get() error {
+	f, err := os.ReadFile("magefiles/meta.json")
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(f, &m)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Metadata) Write() error {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile("magefiles/meta.json", data, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func buildNumberUp(m *Metadata) error {
+	err := m.Get()
+	if err != nil {
+		return err
+	}
+	m.BuildNumber++
+	err = m.Write()
 	if err != nil {
 		return err
 	}
