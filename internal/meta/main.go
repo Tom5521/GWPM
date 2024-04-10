@@ -17,6 +17,7 @@ var (
 	}()
 )
 
+// These variables represent a Boolean value that will be assigned when compiling
 var (
 	DevBuildStr string
 	ReleaseStr  string

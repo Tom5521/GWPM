@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -26,8 +27,31 @@ var env = func() map[string]string {
 }()
 
 func (Build) App() error {
-	err := sh.RunWithV(env, "go", "build", "-v", "-o=builds/gwpm.exe", ".")
-	return err
+	tags, err := sh.OutCmd("git", "tag")()
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(tags, "\n")
+	version := lines[len(lines)-1]
+
+	m := new(Metadata)
+	err = buildNumberUp(m)
+	if err != nil {
+		return err
+	}
+
+	flags := fmt.Sprintf("internal/meta.DevBuildStr=false internal/meta.ReleaseStr=true internal/meta.Version=%s internal/meta.BuildNumber=%v", version, m.BuildNumber)
+	return build.WithLdflags(flags)
+}
+
+func (Build) Dev() error {
+	m := new(Metadata)
+	err := buildNumberUp(m)
+	if err != nil {
+		return err
+	}
+	flags := "internal/meta.DevBuildStr=true internal/meta.ReleaseStr=false internal/meta.Version=devBuild internal/meta.BuildNumber=" + strconv.Itoa(m.BuildNumber)
+	return build.WithLdflags(flags)
 }
 
 func (Build) WithLdflags(input string) error {
