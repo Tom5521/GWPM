@@ -9,7 +9,7 @@ func InfiniteLoadingDialog(functions ...func()) {
 	bar := widget.NewProgressBarInfinite()
 	bar.Start()
 	d := dialog.NewCustomWithoutButtons(
-		"Loading...",
+		po.Get("Loading..."),
 		bar,
 		cui.mainWindow,
 	)
@@ -25,7 +25,7 @@ func FuncLoadingDialog(funcs ...func()) {
 	bar.Value = 0
 
 	d := dialog.NewCustomWithoutButtons(
-		"Loading...",
+		po.Get("Loading..."),
 		bar,
 		cui.mainWindow,
 	)
@@ -50,7 +50,7 @@ func makeRawProgressDialog(text string) *dialog.CustomDialog {
 	bar := widget.NewProgressBarInfinite()
 	bar.Start()
 	return dialog.NewCustomWithoutButtons(
-		text,
+		po.Get(text),
 		bar,
 		cui.mainWindow,
 	)

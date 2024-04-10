@@ -6,10 +6,12 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
+	"github.com/Tom5521/GWPM/locales"
 	"github.com/Tom5521/GWPM/pkg"
 	"github.com/Tom5521/GWPM/pkg/choco"
 	"github.com/Tom5521/GWPM/pkg/gui/popups"
 	"github.com/Tom5521/GWPM/pkg/scoop"
+	"github.com/leonelquinteros/gotext"
 	"github.com/ncruces/zenity"
 
 	boxes "fyne.io/fyne/v2/container"
@@ -24,6 +26,7 @@ const (
 	ManagerID     = "manager"
 	ListModeID    = "list-mode"
 	SearchEntryID = "search-entry"
+	LangID        = "lang"
 )
 
 type packager struct {
@@ -48,7 +51,10 @@ type ui struct {
 	list     *widget.List
 }
 
-var cui *ui
+var (
+	cui *ui
+	po  *gotext.Po
+)
 
 func InitGUI() {
 	app := app.NewWithID("com.github.tom5521.gwpm")
@@ -61,12 +67,13 @@ func InitGUI() {
 		search:   new(Search),
 		mainMenu: new(MainMenu),
 	}
-	cui.mainWindow = app.NewWindow("Graphic Windows Package Manager")
+	InitLocales()
+	cui.mainWindow = app.NewWindow(po.Get("Graphic Windows Package Manager"))
 	cui.mainWindow.SetMaster()
 	cui.mainWindow.Resize(fyne.NewSize(830, 390))
 
-	// Initialize methods.
 	InitDialogs()
+	// Initialize methods.
 	cui.InitManager()
 	cui.sideBar.Init()
 	cui.search.Init()
@@ -78,6 +85,12 @@ func InitGUI() {
 
 	cui.mainWindow.SetContent(cui.mainBox)
 	cui.mainWindow.ShowAndRun()
+}
+func InitLocales() {
+	if cui.settings.String(LangID) == "" {
+		cui.settings.SetString(LangID, "en")
+	}
+	po = locales.GetPo(cui.settings.String(LangID))
 }
 
 func (ui *ui) InitManager() {
@@ -97,19 +110,19 @@ func (ui *ui) InitManager() {
 	ui.manager = manager(ui.settings.String(ManagerID))
 	if !ui.manager.IsInstalled() {
 		err := zenity.Question(
-			"The current package manager is not installed,Do you want to install a package manager?",
-			zenity.Title("Install a package manager?"),
-			zenity.OKLabel("Install"),
-			zenity.CancelLabel("Exit"),
+			po.Get("The current package manager is not installed,Do you want to install a package manager?"),
+			zenity.Title(po.Get("Install a package manager?")),
+			zenity.OKLabel(po.Get("Install")),
+			zenity.CancelLabel(po.Get("Exit")),
 		)
 		if err != nil {
 			os.Exit(1)
 			return
 		}
 		selected, err := zenity.List(
-			"Select a package manager to install",
+			po.Get("Select a package manager to install"),
 			Managers,
-			zenity.OKLabel("Install"),
+			zenity.OKLabel(po.Get("Install")),
 		)
 		if err != nil {
 			os.Exit(0)
@@ -181,8 +194,8 @@ func (ui *ui) InitList() {
 }
 
 func (ui *ui) InitBoxes() {
-	installBtn := widget.NewButton("Install", InstallSelected)
-	uninstallBtn := widget.NewButton("Uninstall", UninstallSelected)
+	installBtn := widget.NewButton(po.Get("Install"), InstallSelected)
+	uninstallBtn := widget.NewButton(po.Get("Uninstall"), UninstallSelected)
 	buttonsBox := boxes.NewAdaptiveGrid(2, installBtn, uninstallBtn)
 
 	ui.mainBox = boxes.NewBorder(ui.search.Box, buttonsBox, nil, ui.sideBar.Box, ui.list)

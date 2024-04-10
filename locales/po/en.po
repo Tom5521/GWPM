@@ -1,0 +1,140 @@
+
+
+msgid ""
+msgstr ""
+
+
+# internal/gui/dialog.go
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Installing..."
+msgstr ""
+
+msgid "Uninstalling..."
+msgstr ""
+
+# internal/gui/init.go
+
+msgid "Graphic Windows Package Manager"
+msgstr ""
+
+msgid "The current package manager is not installed,Do you want to install a package manager?"
+msgstr ""
+
+msgid "Install a package manager?"
+msgstr ""
+
+msgid "Install"
+msgstr ""
+
+msgid "Exit"
+msgstr ""
+
+msgid "Select a package manager to install"
+msgstr ""
+
+msgid "Uninstall"
+msgstr ""
+
+# internal/gui/mainMenu.go
+
+msgid "File"
+msgstr ""
+
+msgid "Reload"
+msgstr ""
+
+msgid "Packages"
+msgstr ""
+
+msgid "Select all"
+msgstr ""
+
+msgid "Unselect all"
+msgstr ""
+
+msgid "Install selected packages"
+msgstr ""
+
+msgid "Uninstall selected packages"
+msgstr ""
+
+msgid "Options"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Change package manager"
+msgstr ""
+
+msgid "Select manager"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Manager:"
+msgstr ""
+
+msgid "No option selected."
+msgstr ""
+
+# internal/gui/search.go
+
+msgid "Search"
+msgstr ""
+
+msgid "Local"
+msgstr ""
+
+msgid "Repository"
+msgstr ""
+
+# internal/gui/settings.go
+
+msgid "Settings"
+msgstr ""
+
+msgid "Package manager:"
+msgstr ""
+
+msgid "Credits"
+msgstr ""
+
+msgid "Language:"
+msgstr ""
+
+msgid "Restart the application to see it in your language."
+msgstr ""
+
+# internal/gui/sideBar.go
+
+msgid "Name:"
+msgstr ""
+
+msgid "Version:"
+msgstr ""
+
+msgid "Installed:"
+msgstr ""
+
+msgid "Manager:"
+msgstr ""
+
+msgid "Local:"
+msgstr ""
+
+msgid "Repo:"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "loading..."
+msgstr ""

@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	fyne.io/fyne/v2 v2.4.4
 	github.com/Tom5521/GoNotes v1.3.0
+	github.com/leonelquinteros/gotext v1.6.0
 	github.com/magefile/mage v1.15.0
 	github.com/ncruces/zenity v0.10.12
 	github.com/sahilm/fuzzy v0.1.1

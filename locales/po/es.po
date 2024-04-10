@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+
+# internal/gui/dialog.go
+
+msgid "Loading..."
+msgstr "Cargando..."
+
+msgid "Installing..."
+msgstr "Instalando..."
+
+msgid "Uninstalling..."
+msgstr "Desinstalando..."
+
+# internal/gui/init.go
+
+msgid "Graphic Windows Package Manager"
+msgstr "Gestor de Paquetes Gráfico para Windows"
+
+msgid "The current package manager is not installed,Do you want to install a package manager?"
+msgstr "El gestor de paquetes actual no está instalado. ¿Desea instalar un gestor de paquetes?"
+
+msgid "Install a package manager?"
+msgstr "¿Instalar un gestor de paquetes?"
+
+msgid "Install"
+msgstr "Instalar"
+
+msgid "Exit"
+msgstr "Salir"
+
+msgid "Select a package manager to install"
+msgstr "Selecciona un gestor de paquetes para instalar"
+
+msgid "Uninstall"
+msgstr "Desinstalar"
+
+# internal/gui/mainMenu.go
+
+msgid "File"
+msgstr "Archivo"
+
+msgid "Reload"
+msgstr "Recargar"
+
+msgid "Packages"
+msgstr "Paquetes"
+
+msgid "Select all"
+msgstr "Seleccionar todo"
+
+msgid "Unselect all"
+msgstr "Deseleccionar todo"
+
+msgid "Install selected packages"
+msgstr "Instalar paquetes seleccionados"
+
+msgid "Uninstall selected packages"
+msgstr "Desinstalar paquetes seleccionados"
+
+msgid "Options"
+msgstr "Opciones"
+
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Change package manager"
+msgstr "Cambiar gestor de paquetes"
+
+msgid "Select manager"
+msgstr "Seleccionar gestor"
+
+msgid "Select"
+msgstr "Seleccionar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Manager:"
+msgstr "Gestor:"
+
+msgid "No option selected."
+msgstr "Ninguna opción seleccionada."
+
+# internal/gui/search.go
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Local"
+msgstr "Local"
+
+msgid "Repository"
+msgstr "Repositorio"
+
+# internal/gui/settings.go
+
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Package manager:"
+msgstr "Gestor de paquetes:"
+
+msgid "Credits"
+msgstr "Créditos"
+
+msgid "Language:"
+msgstr "Idioma:"
+
+msgid "Restart the application to see it in your language."
+msgstr "Reinicia la aplicación para verla en español."
+
+
+# internal/gui/sideBar.go
+
+msgid "Name:"
+msgstr "Nombre:"
+
+msgid "Version:"
+msgstr "Verción"
+
+msgid "Installed:"
+msgstr "Instalada:"
+
+msgid "Manager:"
+msgstr "Gestor:"
+
+msgid "Local:"
+msgstr "Local:"
+
+msgid "Repo:"
+msgstr "Repo:"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "loading..."
+msgstr "cargando..."

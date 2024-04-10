@@ -24,7 +24,7 @@ func (s *Search) Init() {
 	}
 	s.Entry.SetText(cui.settings.String(SearchEntryID))
 
-	s.Button = widget.NewButton("Search", func() {
+	s.Button = widget.NewButton(po.Get("Search"), func() {
 		LoadingDialog.Show()
 		var (
 			err   error
@@ -57,11 +57,15 @@ func (s *Search) Init() {
 		LoadingDialog.Hide()
 	})
 
-	s.ModeSelect = widget.NewSelect([]string{"Local", "Repository"}, func(str string) {
+	options := []string{
+		po.Get("Local"),
+		po.Get("Repository"),
+	}
+	s.ModeSelect = widget.NewSelect(options, func(str string) {
 		switch str {
-		case "Local":
+		case options[0]:
 			cui.settings.SetString(ListModeID, "local")
-		case "Repository":
+		case options[1]:
 			cui.settings.SetString(ListModeID, "repo")
 		}
 		FuncLoadingDialog(cui.InitPkgSlice)
