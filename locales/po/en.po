@@ -113,6 +113,9 @@ msgstr ""
 msgid "Restart the application to see it in your language."
 msgstr ""
 
+msgid "Version: %s"
+msgstr ""
+
 # internal/gui/sideBar.go
 
 msgid "Name:"

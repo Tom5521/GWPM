@@ -110,6 +110,9 @@ msgstr "Idioma:"
 msgid "Restart the application to see it in your language."
 msgstr "Reinicia la aplicación para verla en español."
 
+msgid "Version: %s"
+msgstr "Version: %s"
+
 
 # internal/gui/sideBar.go
 
@@ -117,7 +120,7 @@ msgid "Name:"
 msgstr "Nombre:"
 
 msgid "Version:"
-msgstr "Verción"
+msgstr "Version:"
 
 msgid "Installed:"
 msgstr "Instalada:"

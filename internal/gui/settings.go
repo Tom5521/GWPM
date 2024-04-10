@@ -69,9 +69,10 @@ func ShowSettingsWindow() {
 
 	// Meta info
 
-	buildNumber := widget.NewLabel(fmt.Sprintf("Build:%v", meta.BuildNumber))
-	releaseVersion := widget.NewLabel(fmt.Sprintf("Release:%v", meta.Release))
-	devBuild := widget.NewLabel(fmt.Sprintf("Development build:%v", meta.DevBuild))
+	buildNumber := widget.NewLabel(fmt.Sprintf("Build: %v", meta.BuildNumber))
+	releaseVersion := widget.NewLabel(fmt.Sprintf("Release: %v", meta.Release))
+	devBuild := widget.NewLabel(fmt.Sprintf("Development build: %v", meta.DevBuild))
+	version := widget.NewLabel(po.Get("Version: %s", meta.Version))
 
 	metaBox := boxes.NewVBox(
 		buildNumber,
@@ -88,6 +89,7 @@ func ShowSettingsWindow() {
 		creditsBtn,
 
 		metaBox,
+		version,
 	)
 
 	w.SetContent(content)
