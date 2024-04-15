@@ -32,7 +32,9 @@ type SideBar struct {
 
 func (s *SideBar) Init() {
 	newFormItem := func(title any, text ...any) *widget.FormItem {
-		return widget.NewFormItem(po.Get(fmt.Sprint(title)), widget.NewLabel(fmt.Sprint(text...)))
+		fi := widget.NewFormItem(po.Get(fmt.Sprint(title)), widget.NewLabel(fmt.Sprint(text...)))
+		s.Slice = append(s.Slice, fi)
+		return fi
 	}
 	s.Name = newFormItem("Name:")
 	s.Version = newFormItem("Version:")
@@ -40,15 +42,6 @@ func (s *SideBar) Init() {
 	s.Manager = newFormItem("Manager:")
 	s.Local = newFormItem("Local:")
 	s.Repo = newFormItem("Repo:")
-
-	s.Slice = append(s.Slice,
-		s.Name,
-		s.Version,
-		s.Installed,
-		s.Manager,
-		s.Local,
-		s.Repo,
-	)
 
 	s.Close = widget.NewButton(po.Get("Close"), func() {
 		s.Clean()
