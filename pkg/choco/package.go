@@ -2,7 +2,6 @@ package choco
 
 import (
 	"github.com/Tom5521/GWPM/pkg"
-	"github.com/Tom5521/GWPM/pkg/term"
 )
 
 // TODO:Document this.
@@ -24,9 +23,11 @@ func (p *Package) Uninstall() error {
 }
 
 func (p *Package) Reinstall() error {
-	cmd := term.NewCommand("choco", "install", "--force", "-y", p.Name())
-	cmd.Hide = p.manager.HideActions
-	return cmd.Run()
+	return p.manager.Reinstall(p)
+}
+
+func (p *Package) Upgrade() error {
+	return p.manager.Upgrade(p)
 }
 
 func (p *Package) Version() string {

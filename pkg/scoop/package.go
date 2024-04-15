@@ -58,3 +58,7 @@ func (p *Package) Local() bool {
 func (p *Package) Repo() bool {
 	return p.repo
 }
+
+func (p *Package) Upgrade() error {
+	return p.manager.Upgrade(p)
+}

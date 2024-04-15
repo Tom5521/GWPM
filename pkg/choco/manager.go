@@ -30,7 +30,6 @@ func (m *Manager) InstallByName(pkgs ...string) error {
 	cmd := term.NewCommand("choco", "install", "-y")
 	cmd.Args = append(cmd.Args, pkgs...)
 	cmd.Hide = m.HideActions
-	fmt.Println(cmd.Make())
 
 	return cmd.Run()
 }
@@ -248,4 +247,37 @@ func (m *Manager) InstallManager() error {
 	const command = "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
 	cmd := term.NewCommand("powershell", "-c", command)
 	return cmd.Run()
+}
+
+func (m *Manager) UpgradeByName(names ...string) error {
+	cmd := term.NewCommand("choco", "upgrade", "-y")
+	cmd.Args = append(cmd.Args, names...)
+	cmd.Hide = m.HideActions
+
+	return cmd.Run()
+}
+
+func (m *Manager) Upgrade(pkgs ...pkg.Packager) error {
+	var pkgNames []string
+	for _, p := range pkgs {
+		pkgNames = append(pkgNames, p.Name())
+	}
+	return m.UpgradeByName(pkgNames...)
+}
+
+func (m *Manager) ReinstallByName(names ...string) error {
+	cmd := term.NewCommand("choco", "install", "-y", "--force")
+	cmd.Args = append(cmd.Args, names...)
+	cmd.Hide = m.HideActions
+
+	return cmd.Run()
+}
+
+func (m *Manager) Reinstall(pkgs ...pkg.Packager) error {
+	var pkgNames []string
+	for _, p := range pkgs {
+		pkgNames = append(pkgNames, p.Name())
+	}
+
+	return m.ReinstallByName(pkgNames...)
 }
