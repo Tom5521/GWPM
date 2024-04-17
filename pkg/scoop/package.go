@@ -18,11 +18,24 @@ func (p *Package) Install() error {
 }
 
 func (p *Package) Uninstall() error {
-	return p.manager.Uninstall(p)
+	err := p.manager.Uninstall(p)
+	if err != nil {
+		return err
+	}
+	p.local = false
+	return nil
 }
 
 func (p *Package) Reinstall() error {
-	return p.Install()
+	err := p.Uninstall()
+	if err != nil {
+		return err
+	}
+	err = p.Install()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Package) Version() string {

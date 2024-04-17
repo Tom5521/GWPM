@@ -19,7 +19,12 @@ func (p *Package) Install() error {
 }
 
 func (p *Package) Uninstall() error {
-	return p.manager.UninstallByName(p.Name())
+	err := p.manager.UninstallByName(p.Name())
+	if err != nil {
+		return err
+	}
+	p.local = false
+	return nil
 }
 
 func (p *Package) Reinstall() error {
@@ -47,18 +52,23 @@ func (p *Package) Manager() pkg.Managerer {
 }
 
 func (p *Package) Installed() bool {
-	ipkgs, _ := p.manager.LocalPkgs()
-	for _, ip := range ipkgs {
-		if p.Name() == ip.Name() {
+	lpkgs, err := p.manager.LocalPkgs()
+	if err != nil {
+		return false
+	}
+	for _, lp := range lpkgs {
+		if lp.Name() == p.Name() {
 			return true
 		}
 	}
+
 	return false
 }
 
 func (p *Package) Local() bool {
 	return p.local
 }
+
 func (p *Package) Repo() bool {
 	return p.repo
 }
