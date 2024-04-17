@@ -141,3 +141,12 @@ msgstr ""
 
 msgid "loading..."
 msgstr ""
+
+msgid "Install"
+msgstr ""
+
+msgid "Uninstall"
+msgstr ""
+
+msgid "Upgrade"
+msgstr ""

@@ -139,3 +139,6 @@ msgstr "Cerrar"
 
 msgid "loading..."
 msgstr "cargando..."
+
+msgid "Upgrade"
+msgstr "Actualizar"
