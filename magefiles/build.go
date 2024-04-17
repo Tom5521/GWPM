@@ -39,9 +39,8 @@ func (Build) App() error {
 	if err != nil {
 		return err
 	}
-
-	flags := fmt.Sprintf("internal/meta.DevBuildStr=false internal/meta.ReleaseStr=true internal/meta.Version=%s internal/meta.BuildNumber=%v", version, m.BuildNumber)
-	return build.WithLdflags(flags)
+	const flags = "internal/meta.DevBuildStr=false internal/meta.ReleaseStr=true internal/meta.Version=%s internal/meta.BuildNumber=%v"
+	return build.WithLdflags(fmt.Sprintf(flags, version, m.BuildNumber))
 }
 
 func (Build) Dev() error {
@@ -50,8 +49,8 @@ func (Build) Dev() error {
 	if err != nil {
 		return err
 	}
-	flags := "internal/meta.DevBuildStr=true internal/meta.ReleaseStr=false internal/meta.Version=devBuild internal/meta.BuildNumber=" + strconv.Itoa(m.BuildNumber)
-	return build.WithLdflags(flags)
+	const flags = "internal/meta.DevBuildStr=true internal/meta.ReleaseStr=false internal/meta.Version=devBuild internal/meta.BuildNumber=%s"
+	return build.WithLdflags(fmt.Sprintf(flags, strconv.Itoa(m.BuildNumber)))
 }
 
 func (Build) WithLdflags(input string) error {
