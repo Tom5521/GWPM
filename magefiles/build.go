@@ -19,7 +19,7 @@ var env = func() map[string]string {
 	if runtime.GOOS != "windows" {
 		env = map[string]string{
 			"GOOS":        "windows",
-			"CC":          "x86_64-w64-mingw32-gcc",
+			"CC":          "zig cc -target x86_64-windows-gnu",
 			"CGO_ENABLED": "1",
 		}
 	}
