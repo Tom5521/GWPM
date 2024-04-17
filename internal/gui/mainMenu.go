@@ -81,35 +81,3 @@ func (m *MainMenu) Init() {
 		),
 	)
 }
-
-func UninstallSelected() {
-	UninstallingDialog.Show()
-	pkgs := checkedPkgs()
-	err := cui.manager.UninstallByName(pkgs...)
-	if err != nil {
-		popups.Error(err)
-	}
-	cui.InitPkgSlice()
-	UninstallingDialog.Hide()
-}
-
-func InstallSelected() {
-	InstallingDialog.Show()
-	pkgs := checkedPkgs()
-	err := cui.manager.InstallByName(pkgs...)
-	if err != nil {
-		popups.Error(err)
-	}
-	cui.InitPkgSlice()
-	InstallingDialog.Hide()
-}
-
-func checkedPkgs() []string {
-	var pkgs []string
-	for _, p := range cui.packages {
-		if p.Checked {
-			pkgs = append(pkgs, p.Name())
-		}
-	}
-	return pkgs
-}

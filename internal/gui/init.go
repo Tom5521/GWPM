@@ -42,7 +42,10 @@ type ui struct {
 
 	mainMenu   *MainMenu
 	mainWindow fyne.Window
-	mainBox    *fyne.Container
+
+	bottomButtonsBox *fyne.Container
+
+	mainBox *fyne.Container
 
 	manager pkg.Managerer
 
@@ -90,6 +93,8 @@ func InitGUI() {
 	cui.InitBoxes()
 	cui.mainMenu.Init()
 	cui.mainWindow.SetMainMenu(cui.mainMenu.Menu)
+
+	go InitSelectionChecker()
 
 	cui.mainWindow.SetContent(cui.mainBox)
 	cui.mainWindow.ShowAndRun()
@@ -204,7 +209,7 @@ func (ui *ui) InitList() {
 func (ui *ui) InitBoxes() {
 	installBtn := widget.NewButton(po.Get("Install"), InstallSelected)
 	uninstallBtn := widget.NewButton(po.Get("Uninstall"), UninstallSelected)
-	buttonsBox := boxes.NewAdaptiveGrid(2, installBtn, uninstallBtn)
+	ui.bottomButtonsBox = boxes.NewAdaptiveGrid(2, installBtn, uninstallBtn)
 
-	ui.mainBox = boxes.NewBorder(ui.search.Box, buttonsBox, nil, ui.sideBar.Box, ui.list)
+	ui.mainBox = boxes.NewBorder(ui.search.Box, ui.bottomButtonsBox, nil, ui.sideBar.Box, ui.list)
 }
