@@ -8,6 +8,7 @@ import (
 	boxes "fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Tom5521/GWPM/pkg"
+	"github.com/Tom5521/GWPM/pkg/gui/popups"
 )
 
 type SideBar struct {
@@ -26,6 +27,10 @@ type SideBar struct {
 	Repo      *widget.FormItem
 
 	Close *widget.Button
+
+	installBtn   *widget.Button
+	uninstallBtn *widget.Button
+	upgradeBtn   *widget.Button
 
 	LoadBar *widget.ProgressBar
 }
@@ -57,6 +62,8 @@ func (s *SideBar) Init() {
 		boxes.NewVBox(
 			s.Form,
 			s.LoadBar,
+			s.MakeButtons(),
+			widget.NewSeparator(),
 			s.Close,
 		),
 	)
@@ -82,12 +89,15 @@ func (s *SideBar) Load(p pkg.Packager) {
 	s.Clean()
 
 	go func() {
+		installed := p.Installed()
+		s.LoadButtons(packager{Packager: p}, installed)
+
 		setText(s.Name, p.Name())
 		setText(s.Version, p.Version())
 		setText(s.Manager, p.Manager().Name())
 		setText(s.Local, p.Local())
 		setText(s.Repo, p.Repo())
-		setText(s.Installed, p.Installed())
+		setText(s.Installed, installed)
 
 		s.LoadBar.Hide()
 		s.LoadBar.SetValue(0)
@@ -100,5 +110,58 @@ func (s *SideBar) Clean() {
 	}
 	for _, i := range s.Slice {
 		clean(i)
+	}
+}
+
+func (s *SideBar) MakeButtons() *fyne.Container {
+	s.installBtn = widget.NewButton(po.Get("Install"), nil)
+	s.uninstallBtn = widget.NewButton(po.Get("Uninstall"), nil)
+	s.upgradeBtn = widget.NewButton(po.Get("Upgrade"), nil)
+
+	return boxes.NewVBox(
+		boxes.NewAdaptiveGrid(2,
+			s.installBtn,
+			s.upgradeBtn,
+		),
+		s.uninstallBtn,
+	)
+}
+
+func (s *SideBar) LoadButtons(p packager, installed bool) {
+	s.upgradeBtn.Enable()
+	s.installBtn.Enable()
+	s.uninstallBtn.Enable()
+
+	if !installed {
+		s.upgradeBtn.Disable()
+		s.uninstallBtn.Disable()
+	} else {
+		s.upgradeBtn.OnTapped = func() {
+			LoadingDialog.Show()
+			err := p.Upgrade()
+			if err != nil {
+				popups.Error(err)
+			}
+			LoadingDialog.Hide()
+			s.Load(p)
+		}
+		s.uninstallBtn.OnTapped = func() {
+			UninstallingDialog.Show()
+			err := p.Uninstall()
+			if err != nil {
+				popups.Error(err)
+			}
+			UninstallingDialog.Hide()
+			s.Load(p)
+		}
+	}
+	s.installBtn.OnTapped = func() {
+		InstallingDialog.Show()
+		err := p.Install()
+		if err != nil {
+			popups.Error(err)
+		}
+		s.LoadButtons(p, !installed)
+		InstallingDialog.Hide()
 	}
 }

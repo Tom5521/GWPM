@@ -2,6 +2,8 @@ package term
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	msg "github.com/Tom5521/GoNotes/pkg/messages"
 )
@@ -21,6 +23,17 @@ type Command struct {
 
 	Bin  string
 	Args []string
+}
+
+func (c *Command) Make() *exec.Cmd {
+	cmd := exec.Command(c.Bin, c.Args...)
+	if c.Hide {
+		return cmd
+	}
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd
 }
 
 func (c *Command) Run() error {

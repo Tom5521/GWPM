@@ -18,6 +18,7 @@ type Packager interface {
 	Install() error
 	Uninstall() error
 	Reinstall() error
+	Upgrade() error
 	Version() string
 	Name() string
 	Installed() bool
@@ -35,6 +36,10 @@ type Managerer interface {
 	Install(...Packager) error
 	UninstallByName(...string) error
 	Uninstall(...Packager) error
+	UpgradeByName(...string) error
+	Upgrade(...Packager) error
+	ReinstallByName(...string) error
+	Reinstall(...Packager) error
 	Version() string
 	LocalPkgs() ([]Packager, error)
 	RepoPkgByName(string) (Packager, error)

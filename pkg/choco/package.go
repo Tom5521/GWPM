@@ -2,7 +2,6 @@ package choco
 
 import (
 	"github.com/Tom5521/GWPM/pkg"
-	"github.com/Tom5521/GWPM/pkg/term"
 )
 
 // TODO:Document this.
@@ -20,13 +19,20 @@ func (p *Package) Install() error {
 }
 
 func (p *Package) Uninstall() error {
-	return p.manager.UninstallByName(p.Name())
+	err := p.manager.UninstallByName(p.Name())
+	if err != nil {
+		return err
+	}
+	p.local = false
+	return nil
 }
 
 func (p *Package) Reinstall() error {
-	cmd := term.NewCommand("choco", "install", "--force", "-y", p.Name())
-	cmd.Hide = p.manager.HideActions
-	return cmd.Run()
+	return p.manager.Reinstall(p)
+}
+
+func (p *Package) Upgrade() error {
+	return p.manager.Upgrade(p)
 }
 
 func (p *Package) Version() string {
@@ -46,18 +52,23 @@ func (p *Package) Manager() pkg.Managerer {
 }
 
 func (p *Package) Installed() bool {
-	ipkgs, _ := p.manager.LocalPkgs()
-	for _, ip := range ipkgs {
-		if p.Name() == ip.Name() {
+	lpkgs, err := p.manager.LocalPkgs()
+	if err != nil {
+		return false
+	}
+	for _, lp := range lpkgs {
+		if lp.Name() == p.Name() {
 			return true
 		}
 	}
+
 	return false
 }
 
 func (p *Package) Local() bool {
 	return p.local
 }
+
 func (p *Package) Repo() bool {
 	return p.repo
 }

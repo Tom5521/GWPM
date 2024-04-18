@@ -254,3 +254,35 @@ func (m *Manager) InstallManager() error {
 	cmd = term.NewCommand("powershell", "-c", command2)
 	return cmd.Run()
 }
+
+func (m *Manager) UpgradeByName(names ...string) error {
+	cmd := term.NewCommand("scoop", "update")
+	cmd.Args = append(cmd.Args, names...)
+	cmd.Hide = m.HideActions
+
+	return cmd.Run()
+}
+
+func (m *Manager) Upgrade(packages ...pkg.Packager) error {
+	var pkgNames []string
+	for _, p := range packages {
+		pkgNames = append(pkgNames, p.Name())
+	}
+	return m.UpgradeByName(pkgNames...)
+}
+
+func (m *Manager) ReinstallByName(names ...string) error {
+	cmd := term.NewCommand("scoop", "install")
+	cmd.Args = append(cmd.Args, names...)
+	cmd.Hide = m.HideActions
+
+	return cmd.Run()
+}
+
+func (m *Manager) Reinstall(packages ...pkg.Packager) error {
+	var pkgNames []string
+	for _, p := range packages {
+		pkgNames = append(pkgNames, p.Name())
+	}
+	return m.ReinstallByName(pkgNames...)
+}
